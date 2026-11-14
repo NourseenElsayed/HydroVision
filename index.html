@@ -1,0 +1,3253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroVision | NASA NISAR River Basins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .active-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+    </style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+#basin-map .river-flow-line {
+ stroke-dasharray:9 8;
+ animation:hydroRiverFlow 1.7s linear infinite;
+}
+@keyframes hydroRiverFlow { to { stroke-dashoffset:-34; } }
+</style>
+
+
+<!-- HYDROVISION_PRO_UI_V1 -->
+<style>
+:root {
+  color-scheme: dark;
+  --hv-cyan: #22d3ee;
+  --hv-blue: #38bdf8;
+  --hv-border: rgba(148, 163, 184, .16);
+  --hv-surface: rgba(15, 23, 42, .72);
+}
+
+/* Smooth, consistent interface */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #155e75 #0b1220;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(34, 211, 238, .25);
+  color: #ecfeff;
+}
+
+/* Premium cards */
+.glass-card {
+  border: 1px solid var(--hv-border);
+  box-shadow:
+    0 10px 35px rgba(2, 8, 23, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .025);
+  transition:
+    border-color .22s ease,
+    box-shadow .22s ease,
+    transform .22s ease,
+    background-color .22s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(34, 211, 238, .28);
+  box-shadow:
+    0 16px 42px rgba(2, 8, 23, .25),
+    0 0 22px rgba(34, 211, 238, .045);
+}
+
+/* Buttons and interactive controls */
+button,
+.role-btn,
+.basin-btn {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--hv-cyan);
+  outline-offset: 3px;
+}
+
+button:not(:disabled):active {
+  transform: scale(.98);
+}
+
+.active-btn {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, .24),
+              0 0 18px rgba(34, 211, 238, .09);
+}
+
+/* Dashboard headings */
+h1, h2, h3 {
+  text-wrap: balance;
+  letter-spacing: -.015em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Map presentation */
+#basin-map {
+  overflow: hidden;
+  border: 1px solid var(--hv-border);
+  border-radius: 16px;
+  background: #0f172a;
+  box-shadow: 0 12px 32px rgba(2, 8, 23, .22);
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-control-zoom a {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, .22) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #164e63 !important;
+  color: white !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #164e63;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0891b2;
+}
+
+/* Responsive refinements */
+@media (max-width: 768px) {
+  #basin-map {
+    border-radius: 12px;
+  }
+
+  .glass-card {
+    border-radius: 14px;
+  }
+
+  button {
+    min-height: 40px;
+  }
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+<!-- /HYDROVISION_PRO_UI_V1 -->
+
+
+<!-- HYDROVISION_VISUAL_REFRESH_V2 -->
+<style id="hv-ecuadorian-design">
+
+:root {
+    --hv-gold: #e8b84d;
+    --hv-terracotta: #c65d36;
+    --hv-teal: #27a99a;
+    --hv-emerald: #23856d;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+html[data-hv-theme="dark"] {
+    color-scheme: dark;
+    --hv-bg: #171c1b;
+    --hv-card: rgba(34, 41, 37, .95);
+    --hv-card-soft: rgba(43, 48, 41, .94);
+    --hv-text: #f7f0e5;
+    --hv-muted: #c2b9a9;
+    --hv-border: rgba(232, 184, 77, .24);
+    --hv-nav: rgba(22, 29, 27, .95);
+}
+
+html[data-hv-theme="light"] {
+    color-scheme: light;
+    --hv-bg: #eee5d5;
+    --hv-card: rgba(255, 250, 240, .97);
+    --hv-card-soft: rgba(246, 237, 220, .97);
+    --hv-text: #292b24;
+    --hv-muted: #665e50;
+    --hv-border: rgba(166, 111, 43, .25);
+    --hv-nav: rgba(250, 244, 232, .97);
+}
+
+/* Global background: Earth from space */
+html[data-hv-theme="dark"] body {
+    background-color: var(--hv-bg) !important;
+    background-image:
+        linear-gradient(rgba(17, 25, 24, .91), rgba(24, 29, 26, .96)),
+        url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    color: var(--hv-text);
+}
+
+html[data-hv-theme="light"] body {
+    background-color: var(--hv-bg) !important;
+    background-image:
+        linear-gradient(rgba(240, 231, 215, .91), rgba(240, 231, 215, .96)),
+        url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    color: var(--hv-text);
+}
+
+/* Navigation */
+body > nav {
+    background: var(--hv-nav) !important;
+    border-bottom: 1px solid var(--hv-border) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .16);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+html[data-hv-theme="light"] body > nav {
+    color: #292b24 !important;
+}
+
+html[data-hv-theme="light"] body > nav .text-white,
+html[data-hv-theme="light"] body > nav .text-slate-100,
+html[data-hv-theme="light"] body > nav .text-slate-200,
+html[data-hv-theme="light"] body > nav .text-slate-300 {
+    color: #292b24 !important;
+}
+
+/* Main cards */
+.glass-card {
+    background: linear-gradient(
+        145deg,
+        var(--hv-card),
+        var(--hv-card-soft)
+    ) !important;
+    border: 1px solid var(--hv-border) !important;
+    border-radius: 19px !important;
+    box-shadow:
+        0 13px 36px rgba(0, 0, 0, .16),
+        inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+    backdrop-filter: blur(13px);
+    -webkit-backdrop-filter: blur(13px);
+    transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(232, 184, 77, .43) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .21) !important;
+}
+
+html[data-hv-theme="light"] .glass-card {
+    box-shadow: 0 10px 30px rgba(90, 65, 32, .09) !important;
+}
+
+/* Hero: Andean landscape + space-inspired colors */
+#view-public > .glass-card:first-child {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 235px;
+    padding: 34px !important;
+    background-image:
+        linear-gradient(
+            105deg,
+            rgba(23, 30, 27, .95),
+            rgba(77, 46, 31, .73),
+            rgba(23, 46, 43, .76)
+        ),
+        url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=85") !important;
+    background-size: cover !important;
+    background-position: center 48% !important;
+    border: 1px solid rgba(232, 184, 77, .43) !important;
+}
+
+#view-public > .glass-card:first-child::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .19;
+    background:
+        repeating-linear-gradient(
+            135deg,
+            transparent 0,
+            transparent 24px,
+            rgba(232, 184, 77, .28) 25px,
+            transparent 27px
+        );
+}
+
+#view-public > .glass-card:first-child h1,
+#view-public > .glass-card:first-child h2 {
+    color: #fff4dc !important;
+    font-weight: 800;
+}
+
+#view-public > .glass-card:first-child p {
+    color: #f0e3cf !important;
+    line-height: 1.9;
+}
+
+/* Headings */
+.glass-card h2,
+.glass-card h3 {
+    color: var(--hv-text);
+    font-weight: 800;
+}
+
+html[data-hv-theme="light"] .glass-card h2,
+html[data-hv-theme="light"] .glass-card h3 {
+    color: #343329 !important;
+}
+
+/* Role and basin selection */
+.role-btn,
+.basin-btn {
+    border-radius: 13px !important;
+    border-color: var(--hv-border) !important;
+    transition: all .2s ease;
+}
+
+.role-btn:hover,
+.basin-btn:hover {
+    border-color: var(--hv-gold) !important;
+    transform: translateY(-2px);
+}
+
+.active-btn {
+    background: linear-gradient(
+        125deg,
+        #b84d2d,
+        #d18c32
+    ) !important;
+    border-color: #f0bd59 !important;
+    color: #ffffff !important;
+    box-shadow: 0 7px 22px rgba(198, 93, 54, .25) !important;
+}
+
+/* Strong accent colors */
+html[data-hv-theme="dark"] .text-slate-400 {
+    color: #c2b9a9 !important;
+}
+
+html[data-hv-theme="dark"] .text-slate-300 {
+    color: #ddd2c0 !important;
+}
+
+html[data-hv-theme="light"] .text-slate-400,
+html[data-hv-theme="light"] .text-slate-300,
+html[data-hv-theme="light"] .text-slate-500 {
+    color: #625b4e !important;
+}
+
+html[data-hv-theme="light"] .glass-card .text-white,
+html[data-hv-theme="light"] .glass-card .text-slate-100,
+html[data-hv-theme="light"] .glass-card .text-slate-200 {
+    color: #292b24 !important;
+}
+
+/* NASA metrics */
+.glass-card:has(#metric-flow) {
+    border-top: 3px solid var(--hv-teal) !important;
+}
+
+.glass-card:has(#metric-flow) .grid > div {
+    border-radius: 13px !important;
+    border: 1px solid var(--hv-border) !important;
+    padding: 14px 10px !important;
+}
+
+/* Keep the map and its scientific layers intact */
+#basin-map {
+    overflow: hidden;
+    border-radius: 16px !important;
+    border: 1px solid var(--hv-border) !important;
+    background: #e7e5dc;
+}
+
+.leaflet-container {
+    font-family: 'Cairo', sans-serif !important;
+}
+
+.leaflet-control-zoom a {
+    background: #263d37 !important;
+    color: #fff4dc !important;
+    border-color: rgba(232, 184, 77, .3) !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #a94e2e !important;
+}
+
+/* Form controls */
+html[data-hv-theme="light"] input,
+html[data-hv-theme="light"] select,
+html[data-hv-theme="light"] textarea {
+    background: #fffaf0;
+    color: #292b24;
+    border-color: #c8b99f;
+}
+
+html[data-hv-theme="dark"] input,
+html[data-hv-theme="dark"] select,
+html[data-hv-theme="dark"] textarea {
+    border-color: var(--hv-border);
+}
+
+/* Theme switch */
+#hv-theme-toggle {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 99999;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 47px;
+    padding: 0 18px;
+    border: 1px solid #e8b84d;
+    border-radius: 999px;
+    background: #263d37;
+    color: #fff4dc;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .28);
+    transition: transform .2s ease, background .2s ease;
+}
+
+#hv-theme-toggle:hover {
+    transform: translateY(-3px);
+    background: #a94e2e;
+}
+
+#hv-theme-toggle .hv-theme-icon {
+    font-size: 18px;
+}
+
+html[data-hv-theme="light"] #hv-theme-toggle {
+    background: #a94e2e;
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    #view-public > .glass-card:first-child {
+        padding: 23px !important;
+    }
+
+    #basin-map {
+        border-radius: 12px !important;
+    }
+
+    #hv-theme-toggle {
+        right: 14px;
+        bottom: 14px;
+        min-height: 43px;
+        padding: 0 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    #hv-theme-toggle,
+    .glass-card {
+        transition: none !important;
+    }
+}
+
+
+/* ===== HYDROVISION: BALANCED VISUAL THEMES ===== */
+
+/* More visual depth across information cards */
+.glass-card {
+    background-image:
+        linear-gradient(135deg, rgba(12, 28, 34, .88), rgba(17, 43, 43, .82)),
+        url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=80") !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+/* Alternate imagery for different cards */
+.glass-card:nth-of-type(3n) {
+    background-image:
+        linear-gradient(135deg, rgba(12, 28, 34, .88), rgba(17, 43, 43, .82)),
+        url("https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=80") !important;
+}
+
+.glass-card:nth-of-type(3n + 1) {
+    background-image:
+        linear-gradient(135deg, rgba(12, 28, 34, .88), rgba(17, 43, 43, .82)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80") !important;
+}
+
+/* Warm, balanced light theme */
+html[data-hv-theme="light"] body {
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(195, 145, 83, .17), transparent 35%),
+        radial-gradient(ellipse at 88% 35%, rgba(94, 145, 111, .15), transparent 38%),
+        linear-gradient(145deg, #eee9d9 0%, #e4eadf 48%, #f3e7d8 100%) !important;
+    color: #263a32 !important;
+}
+
+/* Deep green navigation instead of white */
+html[data-hv-theme="light"] body > nav {
+    background: linear-gradient(110deg, #183c35, #245346) !important;
+    border-color: rgba(218, 174, 103, .45) !important;
+    color: #fff8e9 !important;
+}
+
+html[data-hv-theme="light"] body > nav a,
+html[data-hv-theme="light"] body > nav span,
+html[data-hv-theme="light"] body > nav button {
+    color: #fff8e9 !important;
+}
+
+/* Cards: warm surfaces with visible but subtle photography */
+html[data-hv-theme="light"] .glass-card {
+    background-image:
+        linear-gradient(125deg, rgba(250, 247, 232, .91), rgba(224, 234, 216, .88)),
+        url("https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=80") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    border: 1px solid rgba(85, 112, 83, .28) !important;
+    box-shadow: 0 12px 30px rgba(46, 63, 48, .10) !important;
+    color: #293d34 !important;
+}
+
+html[data-hv-theme="light"] .glass-card:nth-of-type(3n) {
+    background-image:
+        linear-gradient(125deg, rgba(249, 239, 220, .91), rgba(237, 222, 198, .87)),
+        url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80") !important;
+}
+
+html[data-hv-theme="light"] .glass-card:nth-of-type(3n + 1) {
+    background-image:
+        linear-gradient(125deg, rgba(232, 241, 225, .92), rgba(215, 230, 211, .88)),
+        url("https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=80") !important;
+}
+
+/* Readable typography */
+html[data-hv-theme="light"] .glass-card,
+html[data-hv-theme="light"] .glass-card p,
+html[data-hv-theme="light"] .glass-card label,
+html[data-hv-theme="light"] .glass-card span:not(.text-white) {
+    color: #34483d !important;
+}
+
+html[data-hv-theme="light"] .glass-card h2,
+html[data-hv-theme="light"] .glass-card h3,
+html[data-hv-theme="light"] .glass-card h4 {
+    color: #244638 !important;
+}
+
+/* Keep the hero cinematic and its text readable */
+html[data-hv-theme="light"] #view-public > .glass-card:first-child {
+    background-image:
+        linear-gradient(100deg, rgba(13, 35, 31, .83), rgba(24, 48, 39, .48)),
+        url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=85") !important;
+    color: #fff8e9 !important;
+}
+
+html[data-hv-theme="light"] #view-public > .glass-card:first-child,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child p,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h1,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h2,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h3 {
+    color: #fff8e9 !important;
+}
+
+/* Inputs and selectors */
+html[data-hv-theme="light"] input,
+html[data-hv-theme="light"] select,
+html[data-hv-theme="light"] textarea {
+    background: #f8f4e8 !important;
+    color: #293d34 !important;
+    border-color: #a9b99f !important;
+}
+
+html[data-hv-theme="light"] button:not(body > nav button) {
+    border-color: rgba(90, 119, 89, .35);
+}
+
+/* Map frame */
+html[data-hv-theme="light"] #basin-map {
+    border: 2px solid #a5b99f !important;
+    box-shadow: 0 8px 24px rgba(41, 61, 48, .12);
+}
+
+/* Footer */
+html[data-hv-theme="light"] footer {
+    background: #1d4037 !important;
+    color: #f8f0df !important;
+    border-color: #b18a50 !important;
+}
+
+
+/* ===== HYDROVISION: FINAL LIGHT MODE TEXT FIX ===== */
+
+html[data-hv-theme="light"] main {
+    color: #34483d !important;
+}
+
+html[data-hv-theme="light"] main p,
+html[data-hv-theme="light"] main li,
+html[data-hv-theme="light"] main label,
+html[data-hv-theme="light"] main small {
+    color: #45594d;
+}
+
+/* Replace pale Tailwind text colors with readable dark tones */
+html[data-hv-theme="light"] body :is(
+    .text-slate-100, .text-slate-200, .text-slate-300,
+    .text-slate-400, .text-gray-100, .text-gray-200,
+    .text-gray-300, .text-gray-400, .text-zinc-100,
+    .text-zinc-200, .text-zinc-300, .text-zinc-400
+):not(button):not(a) {
+    color: #45594d !important;
+}
+
+html[data-hv-theme="light"] .glass-card :is(
+    .text-white, .text-slate-50, .text-slate-100,
+    .text-slate-200, .text-gray-100, .text-gray-200
+):not(button):not(a) {
+    color: #34483d !important;
+}
+
+/* Main headings */
+html[data-hv-theme="light"] main h1,
+html[data-hv-theme="light"] main h2,
+html[data-hv-theme="light"] main h3,
+html[data-hv-theme="light"] main h4 {
+    color: #234638 !important;
+}
+
+/* Keep hero text white over its dark image */
+html[data-hv-theme="light"] #view-public > .glass-card:first-child,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child :is(
+    h1, h2, h3, p, span, label, small
+) {
+    color: #fff8e9 !important;
+}
+
+/* Keep colored button labels readable */
+html[data-hv-theme="light"] main button,
+html[data-hv-theme="light"] main a[role="button"] {
+    color: inherit;
+}
+
+/* Secondary information */
+html[data-hv-theme="light"] .text-muted,
+html[data-hv-theme="light"] .text-secondary {
+    color: #667568 !important;
+}
+
+
+/* ===== FINAL LIGHT THEME: BRIGHT TEXT ===== */
+html[data-hv-theme="light"] main,
+html[data-hv-theme="light"] main p,
+html[data-hv-theme="light"] main li,
+html[data-hv-theme="light"] main label,
+html[data-hv-theme="light"] main small,
+html[data-hv-theme="light"] main span,
+html[data-hv-theme="light"] main div {
+    color: #fff8e9;
+}
+
+html[data-hv-theme="light"] main h1,
+html[data-hv-theme="light"] main h2,
+html[data-hv-theme="light"] main h3,
+html[data-hv-theme="light"] main h4 {
+    color: #fff8e9 !important;
+}
+
+html[data-hv-theme="light"] .glass-card,
+html[data-hv-theme="light"] .glass-card * {
+    color: #fff8e9;
+}
+
+html[data-hv-theme="light"] #view-public > .glass-card:first-child,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child * {
+    color: #fff8e9 !important;
+}
+
+/* Preserve readable dark text in form fields */
+html[data-hv-theme="light"] input,
+html[data-hv-theme="light"] select,
+html[data-hv-theme="light"] textarea {
+    color: #263a32 !important;
+}
+
+
+/* ===== FINAL FIX: GOVERNMENT CARDS, BASIN TEXT & FOOTER ===== */
+
+html[data-hv-theme="light"] #gov-cards,
+html[data-hv-theme="light"] #gov-cards *,
+html[data-hv-theme="light"] #rec-list,
+html[data-hv-theme="light"] #rec-list *,
+html[data-hv-theme="light"] #story-text,
+html[data-hv-theme="light"] #story-text *,
+html[data-hv-theme="light"] footer,
+html[data-hv-theme="light"] footer * {
+    color: #fff8e9 !important;
+}
+
+/* Keep links and headings bright in these sections */
+html[data-hv-theme="light"] #gov-cards h1,
+html[data-hv-theme="light"] #gov-cards h2,
+html[data-hv-theme="light"] #gov-cards h3,
+html[data-hv-theme="light"] #rec-list h1,
+html[data-hv-theme="light"] #rec-list h2,
+html[data-hv-theme="light"] #rec-list h3,
+html[data-hv-theme="light"] #story-text h1,
+html[data-hv-theme="light"] #story-text h2,
+html[data-hv-theme="light"] #story-text h3 {
+    color: #fff8e9 !important;
+}
+
+/* Government tab */
+html[data-hv-theme="light"] #tab-gov {
+    color: #fff8e9 !important;
+}
+
+</style>
+<!-- /HYDROVISION_VISUAL_REFRESH_V2 -->
+
+
+<style id="hv-evidence-features-style">
+#hv-evidence-section {
+    margin-top: 28px;
+    color: var(--hv-text, inherit);
+}
+.hv-evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+.hv-evidence-card {
+    min-width: 0;
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid rgba(148,163,184,.25);
+    background: linear-gradient(145deg, rgba(30,41,59,.92), rgba(15,23,42,.92));
+    box-shadow: 0 12px 35px rgba(0,0,0,.12);
+}
+.hv-evidence-card h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: #e2e8f0;
+}
+.hv-evidence-muted {
+    color: #aab8c9;
+    font-size: .88rem;
+    line-height: 1.75;
+}
+.hv-evidence-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+.hv-evidence-kpi {
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(15,23,42,.48);
+    border: 1px solid rgba(148,163,184,.18);
+}
+.hv-evidence-kpi strong {
+    display: block;
+    font-size: 1.25rem;
+    color: #fbbf24;
+    overflow-wrap: anywhere;
+}
+.hv-evidence-kpi span {
+    display: block;
+    margin-top: 5px;
+    color: #cbd5e1;
+    font-size: .78rem;
+}
+.hv-evidence-list {
+    display: grid;
+    gap: 10px;
+}
+.hv-evidence-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(148,163,184,.16);
+    font-size: .88rem;
+}
+.hv-evidence-row span:first-child {
+    color: #aab8c9;
+}
+.hv-evidence-row strong {
+    text-align: end;
+    color: #f1f5f9;
+    overflow-wrap: anywhere;
+}
+.hv-evidence-map {
+    width: 100%;
+    min-height: 220px;
+    max-height: 390px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #e2e8f0;
+    border: 1px solid rgba(148,163,184,.25);
+}
+.hv-evidence-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 13px;
+    font-size: .8rem;
+    color: #cbd5e1;
+}
+.hv-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+.hv-legend-dot {
+    width: 11px;
+    height: 11px;
+    display: inline-block;
+    border-radius: 3px;
+}
+.hv-evidence-warning {
+    border-inline-start: 4px solid #e6a23c;
+    background: rgba(180,110,30,.13);
+    padding: 13px 15px;
+    border-radius: 10px;
+    color: #f5d9a8;
+    font-size: .85rem;
+    line-height: 1.7;
+    margin-top: 14px;
+}
+.hv-earth-input {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(148,163,184,.35);
+    background: rgba(15,23,42,.65);
+    color: #f8fafc;
+    outline: none;
+}
+.hv-earth-input:focus {
+    border-color: #2dd4bf;
+    box-shadow: 0 0 0 3px rgba(45,212,191,.12);
+}
+.hv-earth-button {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(120deg,#0f766e,#0d9488);
+    color: white;
+    font-weight: 700;
+    font-size: .85rem;
+}
+.hv-earth-button:hover {
+    filter: brightness(1.12);
+}
+#hv-earth-answer {
+    min-height: 90px;
+    padding: 15px;
+    border-radius: 13px;
+    background: rgba(15,23,42,.5);
+    border: 1px solid rgba(148,163,184,.18);
+    line-height: 1.8;
+    font-size: .9rem;
+    white-space: pre-wrap;
+}
+.hv-evidence-card a {
+    color: #5eead4;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+#hv-evidence-section[dir="rtl"] .hv-evidence-row {
+    text-align: right;
+}
+@media (max-width: 800px) {
+    .hv-evidence-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    #hv-evidence-section * {
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}
+html[data-hv-theme="light"] .hv-evidence-card {
+    background: linear-gradient(145deg,#fffdf7,#f1f5e9);
+    border-color: rgba(100,116,100,.25);
+    box-shadow: 0 10px 28px rgba(60,70,45,.08);
+}
+html[data-hv-theme="light"] .hv-evidence-card h3,
+html[data-hv-theme="light"] .hv-evidence-row strong {
+    color: #24352e;
+}
+html[data-hv-theme="light"] .hv-evidence-muted,
+html[data-hv-theme="light"] .hv-evidence-row span:first-child,
+html[data-hv-theme="light"] .hv-evidence-legend,
+html[data-hv-theme="light"] .hv-evidence-kpi span {
+    color: #526358;
+}
+html[data-hv-theme="light"] .hv-evidence-kpi,
+html[data-hv-theme="light"] #hv-earth-answer {
+    background: rgba(226,232,213,.55);
+    border-color: rgba(100,116,100,.2);
+}
+html[data-hv-theme="light"] .hv-earth-input {
+    background: #fffdf7;
+    color: #24352e;
+    border-color: #cbd5c0;
+}
+html[data-hv-theme="light"] .hv-evidence-warning {
+    color: #714b18;
+    background: rgba(217,160,70,.15);
+}
+</style>
+
+<!-- HV_PROFESSIONAL_SIDEBAR_V1 -->
+<style>
+:root {
+    --hv-sidebar-width: 248px;
+    --hv-sidebar-bg: #172d29;
+    --hv-sidebar-border: rgba(255,255,255,.09);
+    --hv-sidebar-text: #d7e3dc;
+    --hv-sidebar-muted: #9aafa4;
+    --hv-sidebar-active: #315c4d;
+    --hv-sidebar-accent: #d5a45d;
+}
+
+#hv-sidebar {
+    position: fixed;
+    z-index: 45;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    width: var(--hv-sidebar-width);
+    padding: 22px 14px;
+    overflow-y: auto;
+    background: var(--hv-sidebar-bg);
+    border-right: 1px solid var(--hv-sidebar-border);
+    color: var(--hv-sidebar-text);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background .25s ease, transform .25s ease;
+}
+
+html[dir="rtl"] #hv-sidebar {
+    left: auto;
+    right: 0;
+    border-right: 0;
+    border-left: 1px solid var(--hv-sidebar-border);
+}
+
+.hv-sidebar-caption {
+    padding: 8px 12px 12px;
+    color: var(--hv-sidebar-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.hv-side-link {
+    width: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 13px;
+    border-radius: 12px;
+    color: var(--hv-sidebar-text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: .2s ease;
+    cursor: pointer;
+    background: transparent;
+    text-align: start;
+}
+
+.hv-side-link:hover {
+    background: rgba(255,255,255,.07);
+    border-color: var(--hv-sidebar-border);
+    transform: translateX(2px);
+}
+
+html[dir="rtl"] .hv-side-link:hover {
+    transform: translateX(-2px);
+}
+
+.hv-side-link.active {
+    color: #fff;
+    background: var(--hv-sidebar-active);
+    border-color: rgba(213,164,93,.35);
+    box-shadow: inset 3px 0 0 var(--hv-sidebar-accent);
+}
+
+html[dir="rtl"] .hv-side-link.active {
+    box-shadow: inset -3px 0 0 var(--hv-sidebar-accent);
+}
+
+.hv-side-icon {
+    width: 23px;
+    min-width: 23px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.hv-sidebar-bottom {
+    margin-top: auto;
+    padding: 14px 12px;
+    border-top: 1px solid var(--hv-sidebar-border);
+    color: var(--hv-sidebar-muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+#hv-sidebar-toggle {
+    display: none;
+}
+
+main.hv-layout-main {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: calc(var(--hv-sidebar-width) + 24px) !important;
+    margin-right: 24px !important;
+}
+
+html[dir="rtl"] main.hv-layout-main {
+    margin-left: 24px !important;
+    margin-right: calc(var(--hv-sidebar-width) + 24px) !important;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 95px;
+}
+
+#view-public,
+#view-gov,
+#basin-map,
+#hv-evidence-section,
+#hv-earth-answer,
+#basin-babahoyo {
+    scroll-margin-top: 100px;
+}
+
+@media (max-width: 900px) {
+    :root { --hv-sidebar-width: 220px; }
+    main.hv-layout-main {
+        margin-left: 232px !important;
+        margin-right: 14px !important;
+    }
+    html[dir="rtl"] main.hv-layout-main {
+        margin-left: 14px !important;
+        margin-right: 232px !important;
+    }
+}
+
+@media (max-width: 680px) {
+    #hv-sidebar {
+        top: 64px;
+        bottom: auto;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 58px;
+        padding: 6px 10px;
+        flex-direction: row;
+        align-items: center;
+        gap: 7px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border: 0;
+        border-bottom: 1px solid var(--hv-sidebar-border);
+        scrollbar-width: none;
+    }
+
+    #hv-sidebar::-webkit-scrollbar { display: none; }
+
+    .hv-sidebar-caption,
+    .hv-sidebar-bottom {
+        display: none;
+    }
+
+    .hv-side-link {
+        width: auto;
+        min-width: max-content;
+        min-height: 40px;
+        padding: 8px 12px;
+        gap: 7px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .hv-side-link.active {
+        box-shadow: inset 0 -3px 0 var(--hv-sidebar-accent);
+    }
+
+    html[dir="rtl"] .hv-side-link.active {
+        box-shadow: inset 0 -3px 0 var(--hv-sidebar-accent);
+    }
+
+    main.hv-layout-main,
+    html[dir="rtl"] main.hv-layout-main {
+        margin: 0 12px !important;
+        padding-top: 138px !important;
+    }
+}
+</style>
+
+<!-- HV_THEME_POLISH_V1 -->
+<style id="hv-theme-polish">
+
+/* Unified theme tokens */
+html[data-hv-theme="dark"] {
+    --hv-sidebar-bg: #192823;
+    --hv-sidebar-text: #e8eee7;
+    --hv-sidebar-muted: #a7b9ac;
+    --hv-sidebar-active: #315b49;
+    --hv-sidebar-border: rgba(221, 191, 135, .16);
+    --hv-page-surface: rgba(30, 42, 36, .94);
+    --hv-input-bg: rgba(17, 30, 25, .88);
+    --hv-soft-surface: rgba(49, 65, 54, .65);
+    --hv-focus: #d5a45d;
+    --hv-shadow: rgba(0, 0, 0, .25);
+}
+
+html[data-hv-theme="light"] {
+    --hv-sidebar-bg: #e7e0d1;
+    --hv-sidebar-text: #2d4035;
+    --hv-sidebar-muted: #716b5d;
+    --hv-sidebar-active: #d6e3d4;
+    --hv-sidebar-border: rgba(112, 91, 57, .18);
+    --hv-page-surface: rgba(255, 251, 242, .96);
+    --hv-input-bg: rgba(255, 252, 245, .96);
+    --hv-soft-surface: rgba(231, 225, 209, .75);
+    --hv-focus: #a66b32;
+    --hv-shadow: rgba(83, 65, 38, .10);
+}
+
+/* Smooth theme transitions */
+body,
+body > nav,
+#hv-sidebar,
+#hv-sidebar a,
+.glass-card,
+input,
+select,
+textarea,
+button {
+    transition:
+        background-color .25s ease,
+        background .25s ease,
+        border-color .25s ease,
+        color .25s ease,
+        box-shadow .25s ease;
+}
+
+/* Sidebar */
+#hv-sidebar {
+    background: var(--hv-sidebar-bg) !important;
+    color: var(--hv-sidebar-text) !important;
+    border-color: var(--hv-sidebar-border) !important;
+    box-shadow: 5px 0 25px var(--hv-shadow);
+}
+
+html[dir="rtl"] #hv-sidebar {
+    box-shadow: -5px 0 25px var(--hv-shadow);
+}
+
+.hv-sidebar-caption,
+.hv-sidebar-bottom {
+    color: var(--hv-sidebar-muted) !important;
+}
+
+.hv-side-link {
+    color: var(--hv-sidebar-text) !important;
+    border-color: transparent;
+}
+
+.hv-side-link:hover {
+    background: var(--hv-soft-surface) !important;
+    border-color: var(--hv-sidebar-border) !important;
+}
+
+.hv-side-link.active {
+    background: var(--hv-sidebar-active) !important;
+    color: var(--hv-sidebar-text) !important;
+    border-color: var(--hv-focus) !important;
+}
+
+/* Top navigation */
+body > nav {
+    background: var(--hv-nav) !important;
+    border-color: var(--hv-border) !important;
+    box-shadow: 0 7px 28px var(--hv-shadow) !important;
+}
+
+html[data-hv-theme="dark"] body > nav {
+    --hv-nav: rgba(23, 37, 31, .96);
+}
+
+html[data-hv-theme="light"] body > nav {
+    --hv-nav: rgba(249, 243, 230, .97);
+    color: #2d4035 !important;
+}
+
+html[data-hv-theme="light"] body > nav .text-slate-300,
+html[data-hv-theme="light"] body > nav .text-slate-400,
+html[data-hv-theme="light"] body > nav .text-slate-200 {
+    color: #46594a !important;
+}
+
+/* Cards */
+html[data-hv-theme="dark"] .glass-card {
+    background: linear-gradient(145deg,
+        rgba(39, 53, 45, .97),
+        rgba(29, 39, 34, .96)) !important;
+    border-color: rgba(213, 164, 93, .23) !important;
+}
+
+html[data-hv-theme="light"] .glass-card {
+    background: linear-gradient(145deg,
+        rgba(255, 252, 245, .98),
+        rgba(242, 235, 219, .97)) !important;
+    border-color: rgba(147, 112, 65, .22) !important;
+    box-shadow: 0 9px 28px rgba(91, 69, 38, .09) !important;
+}
+
+html[data-hv-theme="light"] .glass-card:hover {
+    border-color: rgba(166, 107, 50, .48) !important;
+    box-shadow: 0 13px 32px rgba(91, 69, 38, .13) !important;
+}
+
+/* Evidence explorer */
+html[data-hv-theme="dark"] #hv-evidence-section {
+    color: #eee8da;
+}
+
+html[data-hv-theme="light"] #hv-evidence-section {
+    color: #304236;
+}
+
+html[data-hv-theme="light"] #hv-evidence-section h2,
+html[data-hv-theme="light"] #hv-evidence-section h3 {
+    color: #2c4939 !important;
+}
+
+html[data-hv-theme="light"] #hv-evidence-section p,
+html[data-hv-theme="light"] #hv-evidence-section .hv-evidence-muted {
+    color: #655f51 !important;
+}
+
+/* Inputs and controls */
+html[data-hv-theme="dark"] input,
+html[data-hv-theme="dark"] select,
+html[data-hv-theme="dark"] textarea {
+    background-color: var(--hv-input-bg);
+    color: #f2eee4;
+    border-color: rgba(213, 164, 93, .25);
+}
+
+html[data-hv-theme="light"] input,
+html[data-hv-theme="light"] select,
+html[data-hv-theme="light"] textarea {
+    background-color: var(--hv-input-bg);
+    color: #293b30;
+    border-color: rgba(147, 112, 65, .32);
+}
+
+html[data-hv-theme="light"] input::placeholder,
+html[data-hv-theme="light"] textarea::placeholder {
+    color: #827969;
+}
+
+/* Light mode: readable text */
+html[data-hv-theme="light"] .text-slate-300,
+html[data-hv-theme="light"] .text-slate-400,
+html[data-hv-theme="light"] .text-slate-500 {
+    color: #625e52 !important;
+}
+
+html[data-hv-theme="light"] .text-white,
+html[data-hv-theme="light"] .text-slate-100,
+html[data-hv-theme="light"] .text-slate-200 {
+    color: #293b30;
+}
+
+/* Keep hero text readable over its photo */
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h1,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h2,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child p,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child .text-white,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child .text-slate-200 {
+    color: #fff4dc !important;
+}
+
+/* Buttons */
+html[data-hv-theme="light"] .basin-btn,
+html[data-hv-theme="light"] .role-btn {
+    color: #344638;
+    background-color: rgba(255, 251, 242, .8);
+}
+
+html[data-hv-theme="dark"] .basin-btn,
+html[data-hv-theme="dark"] .role-btn {
+    color: #e9e7dc;
+}
+
+/* Scrollbars */
+html[data-hv-theme="dark"] {
+    scrollbar-color: #557765 #192823;
+}
+
+html[data-hv-theme="light"] {
+    scrollbar-color: #b59a70 #eee5d5;
+}
+
+html[data-hv-theme="dark"] ::-webkit-scrollbar-track {
+    background: #192823;
+}
+
+html[data-hv-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #557765;
+}
+
+html[data-hv-theme="light"] ::-webkit-scrollbar-track {
+    background: #eee5d5;
+}
+
+html[data-hv-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #b59a70;
+}
+
+/* Focus visibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--hv-focus) !important;
+    outline-offset: 3px;
+}
+
+/* Mobile sidebar */
+@media (max-width: 680px) {
+    #hv-sidebar {
+        background: var(--hv-sidebar-bg) !important;
+        box-shadow: 0 7px 22px var(--hv-shadow);
+    }
+}
+
+</style>
+<!-- /HV_THEME_POLISH_V1 -->
+
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-xl shadow-lg">
+                    🌊
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-wide text-white">HydroVision AI</span>
+                    <span class="block text-xs text-cyan-400" data-i18n="nav-sub">تحليل بيانات ناسا لأحواض الأنهار</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-cyan-400 hover:bg-slate-700 transition flex items-center gap-1.5">
+                    <span>🌐</span> <span id="lang-label">English</span>
+                </button>
+
+                <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button onclick="switchMainView('public')" id="tab-public" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition active-btn text-white" data-i18n="tab-public">
+                        بوابة المجتمع
+                    </button>
+                    <button onclick="switchMainView('gov')" id="tab-gov" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition text-slate-300 hover:text-white" data-i18n="tab-gov">
+                        بوابة الدولة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    
+<!-- HV_PROFESSIONAL_SIDEBAR_V1 -->
+<aside id="hv-sidebar" aria-label="Main navigation">
+    <div class="hv-sidebar-caption" data-hv-nav-caption>WORKSPACE</div>
+
+    <a href="#view-public" class="hv-side-link active" data-hv-target="view-public">
+        <span class="hv-side-icon">⌂</span>
+        <span data-hv-ar="نظرة عامة" data-hv-en="Overview" data-hv-es="Resumen">نظرة عامة</span>
+    </a>
+
+    <a href="#basin-babahoyo" class="hv-side-link" data-hv-target="basin-babahoyo">
+        <span class="hv-side-icon">🌊</span>
+        <span data-hv-ar="أحواض الأنهار" data-hv-en="River Basins" data-hv-es="Cuencas">أحواض الأنهار</span>
+    </a>
+
+    <a href="#basin-map" class="hv-side-link" data-hv-target="basin-map">
+        <span class="hv-side-icon">⌖</span>
+        <span data-hv-ar="الخريطة التفاعلية" data-hv-en="Interactive Map" data-hv-es="Mapa interactivo">الخريطة التفاعلية</span>
+    </a>
+
+    <a href="#hv-evidence-section" class="hv-side-link" data-hv-target="hv-evidence-section">
+        <span class="hv-side-icon">🛰</span>
+        <span data-hv-ar="الأدلة العلمية" data-hv-en="Scientific Evidence" data-hv-es="Evidencia científica">الأدلة العلمية</span>
+    </a>
+
+    <a href="#hv-earth-answer" class="hv-side-link" data-hv-target="hv-earth-answer">
+        <span class="hv-side-icon">✧</span>
+        <span data-hv-ar="Ask Earth" data-hv-en="Ask Earth" data-hv-es="Ask Earth">Ask Earth</span>
+    </a>
+
+    <a href="#view-gov" class="hv-side-link" data-hv-target="view-gov" data-hv-view="gov">
+        <span class="hv-side-icon">▤</span>
+        <span data-hv-ar="بوابة الدولة" data-hv-en="Government Portal" data-hv-es="Portal gubernamental">بوابة الدولة</span>
+    </a>
+
+    <div class="hv-sidebar-bottom">
+        <div>HYDROVISION AI</div>
+        <div>EARTH OBSERVATION PLATFORM</div>
+    </div>
+</aside>
+<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full hv-layout-main">
+
+        <!-- VIEW 1: PUBLIC / USERS -->
+        <div id="view-public" class="space-y-8">
+            
+            <div class="glass-card rounded-2xl p-6 md:p-8 shadow-xl">
+                <div class="max-w-3xl">
+                    <span class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-3 border border-cyan-500/20" data-i18n="badge-top">
+                        تحليل قائم على بيانات الأقمار الصناعية NASA NISAR
+                    </span>
+                    <h1 class="text-2xl md:text-4xl font-extrabold text-white mb-3" data-i18n="main-title">
+                        افهم حركة النهر، وتجنب مخاطر الفيضانات في منطقتك
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base mb-6" data-i18n="main-desc">
+                        اختر صفتك وحوض النهر القريب منك للحصول على شرح مبسط للظاهرة وتوصيات مخصصة لحالتك بناءً على البيانات الحية.
+                    </p>
+                </div>
+
+                <!-- Filters Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-700/60">
+                    <!-- Role Selection -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-3" data-i18n="label-role">1. حدد فئتك (من أنت؟):</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setRole('farmer')" id="role-farmer" class="role-btn active-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1">
+                                <span class="text-2xl">🌾</span>
+                                <span class="text-sm font-bold" data-i18n="role-farmer">مزارع</span>
+                            </button>
+                            <button onclick="setRole('tourist')" id="role-tourist" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1 hover:border-slate-500">
+                                <span class="text-2xl">🎒</span>
+                                <span class="text-sm font-bold" data-i18n="role-tourist">سائح / زائر</span>
+                            </button>
+                            <button onclick="setRole('resident')" id="role-resident" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1 hover:border-slate-500">
+                                <span class="text-2xl">🏠</span>
+                                <span class="text-sm font-bold" data-i18n="role-resident">ساكن محلي</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Basin Selection -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-3" data-i18n="label-basin">2. اختر حوض النهر القريب منك:</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="setBasin('babahoyo')" id="basin-babahoyo" class="basin-btn active-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-babahoyo-title">حوض باباهويو</div>
+                                    <div class="text-xs text-cyan-200">Babahoyo Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                            </button>
+                            <button onclick="setBasin('lower_guayas')" id="basin-lower_guayas" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-guayas-title">غواياس السفلي</div>
+                                    <div class="text-xs text-slate-400">Lower Guayas</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            </button>
+                            <button onclick="setBasin('daule')" id="basin-daule" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-daule-title">حوض داولي</div>
+                                    <div class="text-xs text-slate-400">Daule Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            </button>
+                            <button onclick="setBasin('vinces')" id="basin-vinces" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-vinces-title">حوض فينسيس</div>
+                                    <div class="text-xs text-slate-400">Vinces Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Storytelling & Topography Explanation -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <span>🎬</span> <span data-i18n="story-heading">قصة الحوض وطبيعة التضاريس</span>
+                            </h2>
+                            <span id="basin-badge" class="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-bold">
+                                حوض باباهويو (Babahoyo)
+                            </span>
+                        </div>
+                        
+                        <div class="relative rounded-xl overflow-hidden bg-slate-900 border border-slate-700 aspect-video flex flex-col items-center justify-center p-6 text-center">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                            
+<div id="basin-map" role="region" aria-label="Interactive geographic river map"
+ style="width:100%;height:390px;min-height:320px;border-radius:16px;overflow:hidden;background:#e2e8f0;">
+ <div style="padding:20px;color:#334155;">Loading geographic river map...</div>
+</div>
+
+                            <div class="relative z-10">
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                        <h3 class="text-sm font-bold text-cyan-400 mb-1" data-i18n="why-flood">لماذا يحدث الفيضان هنا؟ (التفسير العلمي المبسط)</h3>
+                        <p id="story-text" class="text-sm text-slate-300 leading-relaxed">...</p>
+                    </div>
+                </div>
+
+                <!-- Live NASA Data & AI Recommendations -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col justify-between border-t-4 border-t-cyan-500">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <span>🤖</span> <span data-i18n="ai-recs">توصيات الذكاء الاصطناعي لك</span>
+                            </h2>
+                            <span id="api-status-badge" class="text-xs text-emerald-400 flex items-center gap-1 font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> <span data-i18n="live-data">متصل بالخادم</span>
+                            </span>
+                        </div>
+
+                        <!-- Live Metrics -->
+                        <div class="grid grid-cols-3 gap-2 mb-5">
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-1">معدل التدفق</div>
+                                <div id="metric-flow" class="text-base font-extrabold text-red-400 mt-1">--</div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-2">درجة الانحدار</div>
+                                <div id="metric-slope" class="text-base font-extrabold text-amber-400 mt-1">--</div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-3">احتمال الفيضان</div>
+                                <div id="metric-risk" class="text-base font-extrabold text-red-400 mt-1">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Actionable Steps -->
+                        <div class="space-y-3">
+                            <div class="text-sm font-bold text-slate-200" id="rec-title">...</div>
+                            <ul id="rec-list" class="space-y-2.5 text-sm text-slate-300">
+                                <li class="p-3 rounded-xl bg-slate-800/70 animate-pulse">جاري التحليل...</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+                        <span data-i18n="datasource">المصدر: NASA NISAR GCOV</span>
+                        <span class="text-cyan-400 font-semibold" id="source-mode">API Ready</span>
+                    </div>
+                </div>
+            </div>
+        
+<!-- HV_EVIDENCE_FEATURES_V1 -->
+<section id="hv-evidence-section" class="space-y-5" dir="auto">
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <span class="text-xs font-bold tracking-widest text-teal-400">NASA DATA • SCIENTIFIC EVIDENCE</span>
+            <h2 id="hv-evidence-title" class="text-2xl font-extrabold mt-1">Scientific Evidence & Impact Explorer</h2>
+            <p id="hv-evidence-subtitle" class="hv-evidence-muted mt-1">Explore the evidence behind the selected basin analysis.</p>
+        </div>
+        <span id="hv-evidence-status" class="text-xs font-bold rounded-full px-3 py-2 bg-amber-500/15 text-amber-400 border border-amber-500/30">Provisional estimates</span>
+    </div>
+
+    <div class="hv-evidence-grid">
+
+        <article class="hv-evidence-card">
+            <h3 id="hv-evidence-data-title">Scientific evidence</h3>
+            <div class="hv-evidence-list">
+                <div class="hv-evidence-row"><span id="hv-label-mission">Mission</span><strong>NASA NISAR</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-product">Product</span><strong>Level-2 GCOV</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-event">Event acquisition</span><strong>31 Oct 2026</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-baseline">Baseline search window</span><strong>01 Jun – 15 Oct 2026</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-pol">Polarimetric channels</span><strong>HH and HV</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-method">Method</span><strong id="hv-method-value">Event vs. dry-baseline threshold classification</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-terrain">Terrain source</span><strong>Copernicus DEM GLO-30</strong></div>
+            </div>
+            <div class="hv-evidence-warning" id="hv-evidence-validation">
+                No independent field validation evidence is available in the current project outputs. Threshold-based results are provisional.
+            </div>
+            <div class="mt-4 flex flex-wrap gap-4 text-sm">
+                <a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noopener noreferrer" id="hv-link-nisar">NASA NISAR mission</a>
+                <a href="https://search.asf.alaska.edu/" target="_blank" rel="noopener noreferrer" id="hv-link-asf">ASF data search</a>
+            </div>
+        </article>
+
+        <article class="hv-evidence-card">
+            <h3 id="hv-threshold-title">Classification thresholds</h3>
+            <div class="hv-evidence-list">
+                <div class="hv-evidence-row"><span id="hv-label-water">New open-water threshold</span><strong>−18 dB</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-veg-change">Vegetation change threshold</span><strong>+3 dB</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-hv">Vegetation HV threshold</span><strong>−20 dB</strong></div>
+                <div class="hv-evidence-row"><span id="hv-label-sampling">Processing sampling step</span><strong>8</strong></div>
+            </div>
+            <p class="hv-evidence-muted mt-4" id="hv-threshold-note">
+                Classification thresholds distinguish open water and vegetation changes.
+            </p>
+        </article>
+
+        <article class="hv-evidence-card">
+            <h3 id="hv-change-title">Event classification map</h3>
+            <p class="hv-evidence-muted mb-3" id="hv-change-description">
+                This is the available classified output from the event-versus-baseline analysis, not a pair of raw before-and-after satellite images.
+            </p>
+            <img id="hv-classification-map" class="hv-evidence-map" src="/api/outputs/map" alt="NASA NISAR event flood classification map" loading="lazy">
+            <div class="hv-evidence-legend">
+                <span class="hv-legend-item"><i class="hv-legend-dot" style="background:#1686d9"></i><span id="hv-legend-water">1 — New open water</span></span>
+                <span class="hv-legend-item"><i class="hv-legend-dot" style="background:#26a269"></i><span id="hv-legend-veg">2 — Flooded vegetation proxy</span></span>
+                <span class="hv-legend-item"><i class="hv-legend-dot" style="background:#9ca3af"></i><span id="hv-legend-other">0 — Other</span></span>
+                <span class="hv-legend-item"><i class="hv-legend-dot" style="background:#111827"></i><span id="hv-legend-invalid">255 — No data</span></span>
+            </div>
+            <p class="hv-evidence-muted mt-3" id="hv-map-note">
+                The baseline is a search window (01 Jun–15 Oct 2026), not a single confirmed acquisition date. A multi-date change timeline is not available.
+            </p>
+            <div class="mt-3">
+                <a href="/api/outputs/classes" id="hv-download-classes">Download classification GeoTIFF</a>
+            </div>
+        </article>
+
+        <article class="hv-evidence-card">
+            <h3 id="hv-impact-title">Impact snapshot</h3>
+            <p class="hv-evidence-muted" id="hv-impact-basin">Selected basin: —</p>
+            <div class="hv-evidence-kpis">
+                <div class="hv-evidence-kpi">
+                    <strong id="hv-impact-total">—</strong>
+                    <span id="hv-impact-total-label">Total classified new-water area (km²)</span>
+                </div>
+                <div class="hv-evidence-kpi">
+                    <strong id="hv-impact-percent">—</strong>
+                    <span id="hv-impact-percent-label">Share of valid scene area</span>
+                </div>
+                <div class="hv-evidence-kpi">
+                    <strong id="hv-impact-open">—</strong>
+                    <span id="hv-impact-open-label">New open water (km²)</span>
+                </div>
+                <div class="hv-evidence-kpi">
+                    <strong id="hv-impact-veg">—</strong>
+                    <span id="hv-impact-veg-label">Flooded vegetation proxy (km²)</span>
+                </div>
+            </div>
+            <div class="hv-evidence-warning" id="hv-impact-limit">
+                Spatial analysis indicators are presented for the selected river basins.
+            </div>
+            <p class="hv-evidence-muted mt-3" id="hv-impact-coverage">Scene coverage: —</p>
+        </article>
+
+    </div>
+
+    <article class="hv-evidence-card">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+                <h3 id="hv-earth-title">Ask Earth</h3>
+                <p class="hv-evidence-muted" id="hv-earth-subtitle">A rule-based guide that explains the current project data. It does not generate AI predictions.</p>
+            </div>
+            <span class="text-xs font-bold text-teal-400">RULE-BASED ASSISTANT</span>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input id="hv-earth-question" class="hv-earth-input" type="text" maxlength="240" placeholder="Ask about the map, area, method, or limitations...">
+            <button id="hv-earth-ask" type="button" class="hv-earth-button">Ask</button>
+            <!-- HV_ASSISTANT_VOICE_CONTROLS_V1 -->
+            <button id="hv-earth-mic" type="button" class="hv-earth-button" aria-label="Voice input">🎤 Voice</button>
+            <button id="hv-earth-speak" type="button" class="hv-earth-button" aria-label="Read answer aloud">🔊 Speak</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+            <button type="button" class="hv-earth-button" data-hv-question="area">Area summary</button>
+            <button type="button" class="hv-earth-button" data-hv-question="method">How was it measured?</button>
+            <button type="button" class="hv-earth-button" data-hv-question="limits">What are the limitations?</button>
+            <button type="button" class="hv-earth-button" data-hv-question="sectors">Agriculture and cities</button>
+        </div>
+        <div id="hv-earth-answer" class="mt-4" aria-live="polite">Choose a suggested question or type your own.</div>
+        <p class="hv-evidence-muted mt-3" id="hv-earth-disclaimer">Answers are based on available project fields and fixed rules. They are not official warnings or professional advice.</p>
+    </article>
+
+</section>
+<!-- /HV_EVIDENCE_FEATURES_V1 -->
+</div>
+
+        <!-- VIEW 2: GOVERNMENT / DECISION MAKERS -->
+        <div id="view-gov" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 md:p-8 border-r-4 border-r-amber-500">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20" data-i18n="gov-badge">
+                            تحليل استراتيجي طويل المدى (Long-Term Planning)
+                        </span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-white mt-2" data-i18n="gov-title">
+                            توصيات إدارة الموارد المائية والحد من مخاطر الكوارث
+                        </h1>
+                        <p class="text-slate-400 text-sm mt-1" data-i18n="gov-desc">
+                            حلول هندسية وبيئية مقترحة بناءً على تحليل دورات الفيضان والجفاف عبر المواسم المختلفة.
+                        </p>
+                    </div>
+                    <div class="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 self-start">
+                        <button onclick="setSeason('flood')" id="season-flood" class="px-4 py-2 rounded-lg text-xs font-bold active-btn text-white transition" data-i18n="season-1">
+                            🌧️ موسم الفيضان (Season 1)
+                        </button>
+                        <button onclick="setSeason('drought')" id="season-drought" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition" data-i18n="season-2">
+                            ☀️ موسم الجفاف (Season 2)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gov-cards" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500" data-i18n="footer">
+        HydroVision • NASA NISAR GCOV Data Platform
+    </footer>
+
+    <script>
+        let currentLang = 'ar';
+        let currentRole = 'farmer';
+        let currentBasin = 'babahoyo';
+        let currentSeason = 'flood';
+
+        const i18n = {
+            ar: {
+                'nav-sub': 'تحليل بيانات ناسا لأحواض الأنهار',
+                'tab-public': 'بوابة المجتمع',
+                'tab-gov': 'بوابة الدولة',
+                'badge-top': 'تحليل قائم على بيانات الأقمار الصناعية NASA NISAR',
+                'main-title': 'افهم حركة النهر، وتجنب مخاطر الفيضانات في منطقتك',
+                'main-desc': 'اختر صفتك وحوض النهر القريب منك للحصول على شرح مبسط للظاهرة وتوصيات مخصصة لحالتك بناءً على البيانات الحية.',
+                'label-role': '1. حدد فئتك (من أنت؟):',
+                'role-farmer': 'مزارع',
+                'role-tourist': 'سائح / زائر',
+                'role-resident': 'ساكن محلي',
+                'label-basin': '2. اختر حوض النهر القريب منك:',
+                'basin-babahoyo-title': 'حوض باباهويو',
+                'basin-guayas-title': 'غواياس السفلي',
+                'basin-daule-title': 'حوض داولي',
+                'basin-vinces-title': 'حوض فينسيس',
+                'story-heading': 'قصة الحوض وطبيعة التضاريس',
+                'play-video': 'تشغيل الشرح المرئي للحوض',
+                'why-flood': 'لماذا يحدث الفيضان هنا؟ (التفسير العلمي المبسط)',
+                'ai-recs': 'توصيات الذكاء الاصطناعي لك',
+                'live-data': 'متصل بالخادم',
+                'metric-1': 'مساحة المياه المفتوحة الجديدة (كم²)',
+                'metric-2': 'متوسط الانحدار (درجة)',
+                'metric-3': 'المساحة المصنفة من المشهد الصالح (%)',
+                'datasource': 'المصدر: NASA NISAR GCOV',
+                'gov-badge': 'تحليل استراتيجي طويل المدى (Long-Term Planning)',
+                'gov-title': 'توصيات إدارة الموارد المائية والحد من مخاطر الكوارث',
+                'gov-desc': 'حلول هندسية وبيئية مقترحة بناءً على تحليل دورات الفيضان والجفاف عبر المواسم المختلفة.',
+                'season-1': '🌧️ موسم الفيضان (Season 1)',
+                'season-2': '☀️ موسم الجفاف (Season 2)',
+                'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
+            },
+            en: {
+                'nav-sub': 'NASA River Basins Data Analysis',
+                'tab-public': 'Public Portal',
+                'tab-gov': 'Government Portal',
+                'badge-top': 'Analysis Based on NASA NISAR Satellite Data',
+                'main-title': 'Understand River Flow & Avoid Flood Risks in Your Area',
+                'main-desc': 'Select your role and nearby river basin to get simple explanations and customized actionable recommendations based on live data.',
+                'label-role': '1. Select Your Role:',
+                'role-farmer': 'Farmer',
+                'role-tourist': 'Tourist',
+                'role-resident': 'Local Resident',
+                'label-basin': '2. Select River Basin:',
+                'basin-babahoyo-title': 'Babahoyo Basin',
+                'basin-guayas-title': 'Lower Guayas',
+                'basin-daule-title': 'Daule Basin',
+                'basin-vinces-title': 'Vinces Basin',
+                'story-heading': 'Basin Story & Topography',
+                'play-video': 'Play AI Visual Story',
+                'why-flood': 'Why do floods happen here? (Simple Scientific Explanation)',
+                'ai-recs': 'AI Recommendations For You',
+                'live-data': 'Server Connected',
+                'metric-1': 'New Open Water Area (km²)',
+                'metric-2': 'Mean Slope (degrees)',
+                'metric-3': 'Classified Area of Valid Scene (%)',
+                'datasource': 'Source: NASA NISAR GCOV',
+                'gov-badge': 'Strategic Long-Term Planning',
+                'gov-title': 'Water Resources & Disaster Risk Reduction Recommendations',
+                'gov-desc': 'Proposed engineering and environmental solutions based on flood and drought cycle analysis across seasons.',
+                'season-1': '🌧️ Flood Season (Season 1)',
+                'season-2': '☀️ Drought Season (Season 2)',
+                'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
+            }
+        };
+
+        i18n.es = {
+            "nav-sub": "Plataforma de análisis de cuencas fluviales",
+            "tab-public": "Portal comunitario",
+            "tab-gov": "Portal gubernamental",
+            "badge-top": "Análisis basado en datos satelitales",
+            "main-title": "Comprende los cambios del río y prepárate ante las inundaciones",
+            "main-desc": "Explora las condiciones de tu cuenca y consulta información para tu comunidad.",
+            "label-role": "Selecciona tu perfil",
+            "role-farmer": "Agricultor",
+            "role-tourist": "Turista",
+            "role-resident": "Residente",
+            "label-basin": "Selecciona la cuenca",
+            "basin-babahoyo-title": "Cuenca del Babahoyo",
+            "basin-guayas-title": "Guayas inferior",
+            "basin-daule-title": "Cuenca del Daule",
+            "basin-vinces-title": "Cuenca del Vinces",
+            "story-heading": "Historia de la cuenca",
+            "play-video": "Ver video",
+            "why-flood": "¿Por qué ocurren las inundaciones?",
+            "ai-recs": "Orientaciones específicas de la cuenca",
+            "live-data": "Indicadores de observación",
+            "metric-1": "Nueva superficie de agua",
+            "metric-2": "Pendiente media",
+            "metric-3": "Superficie afectada",
+            "datasource": "Fuente de datos",
+            "gov-badge": "Planificación estratégica",
+            "gov-title": "Panel de planificación gubernamental",
+            "gov-desc": "Orientaciones para apoyar la evaluación y planificación local.",
+            "season-1": "Temporada de inundaciones",
+            "season-2": "Temporada seca",
+            "footer": "HydroVision - Plataforma de datos NASA NISAR GCOV"
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : (currentLang === 'en' ? 'es' : 'ar');
+            const root = document.getElementById('html-root');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('lang-label').textContent = currentLang === 'ar' ? 'English' : (currentLang === 'en' ? 'Español' : 'عربي')
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+            });
+
+            fetchAnalysis();
+            if(!document.getElementById('view-gov').classList.contains('hidden')) fetchGov();
+        }
+
+        function switchMainView(view) {
+            document.getElementById('view-public').classList.toggle('hidden', view !== 'public');
+            document.getElementById('view-gov').classList.toggle('hidden', view !== 'gov');
+            
+            document.getElementById('tab-public').classList.toggle('active-btn', view === 'public');
+            document.getElementById('tab-public').classList.toggle('text-slate-300', view !== 'public');
+            document.getElementById('tab-gov').classList.toggle('active-btn', view === 'gov');
+            document.getElementById('tab-gov').classList.toggle('text-slate-300', view !== 'gov');
+
+            if(view === 'gov') fetchGov();
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active-btn'));
+            document.getElementById('role-' + role).classList.add('active-btn');
+            fetchAnalysis();
+        }
+
+        function setBasin(basin) {
+            currentBasin = basin;
+            document.querySelectorAll('.basin-btn').forEach(btn => btn.classList.remove('active-btn'));
+            document.getElementById('basin-' + basin).classList.add('active-btn');
+            fetchAnalysis();
+        }
+
+        function setSeason(season) {
+            currentSeason = season;
+            document.getElementById('season-flood').classList.toggle('active-btn', season === 'flood');
+            document.getElementById('season-flood').classList.toggle('text-slate-300', season !== 'flood');
+            document.getElementById('season-drought').classList.toggle('active-btn', season === 'drought');
+            document.getElementById('season-drought').classList.toggle('text-slate-300', season !== 'drought');
+            fetchGov();
+        }
+
+        const spanishGuidance = {
+            babahoyo: {
+                farmer: [
+                    "Revise las zonas bajas de los campos antes de regar o mover equipos.",
+                    "Inspeccione los drenajes y canales después de las lluvias.",
+                    "Planifique el transporte de cultivos utilizando rutas más seguras."
+                ],
+                tourist: [
+                    "Consulte el estado de las carreteras cercanas a las llanuras fluviales.",
+                    "Aléjese de las riberas y de las zonas con agua acumulada durante las alertas.",
+                    "Siga las indicaciones locales y utilice lugares seguros para detenerse."
+                ],
+                resident: [
+                    "Consulte las actualizaciones sobre el agua en las zonas residenciales bajas.",
+                    "Identifique rutas de salida seguras y puntos oficiales de reunión.",
+                    "Nunca cruce carreteras inundadas."
+                ]
+            },
+            lower_guayas: {
+                farmer: [
+                    "Evalúe los campos y los sistemas de drenaje teniendo en cuenta el agua procedente de zonas aguas arriba.",
+                    "Coordine el riego y el drenaje según los cambios locales del nivel del agua.",
+                    "Compruebe la salinidad del agua y del suelo antes de utilizar agua costera para el riego."
+                ],
+                tourist: [
+                    "Consulte el estado de las carreteras cercanas a las desembocaduras y zonas costeras.",
+                    "Revise los avisos de lluvia y mareas antes de viajar.",
+                    "Permanezca en rutas autorizadas y lejos de los bordes de los canales."
+                ],
+                resident: [
+                    "Vigile los niveles de agua en las comunidades bajas y el agua procedente de zonas aguas arriba.",
+                    "Consulte los avisos de lluvia y mareas antes de utilizar carreteras costeras.",
+                    "Prepare un plan para trasladarse a terrenos más elevados si las autoridades lo indican."
+                ]
+            },
+            daule: {
+                farmer: [
+                    "Compare los cambios observados en la extensión del agua con las condiciones de los canales de riego y drenaje.",
+                    "Vigile las zonas cercanas a cursos de agua y cruces de equipos después de las lluvias.",
+                    "Coordine la distribución del agua de riego con las autoridades locales."
+                ],
+                tourist: [
+                    "Consulte el estado de las carreteras y puentes cercanos a los cursos de agua.",
+                    "Evite las actividades cerca de canales y riberas durante niveles altos o alertas locales.",
+                    "Siga las indicaciones locales sobre el acceso a zonas recreativas."
+                ],
+                resident: [
+                    "Vigile los cambios del agua cerca de las comunidades y carreteras conectadas con el río Daule.",
+                    "Identifique rutas alternativas si los cruces o las calles cercanas a los canales resultan afectados.",
+                    "Evite las carreteras señaladas como inseguras por las autoridades."
+                ]
+            },
+            vinces: {
+                farmer: [
+                    "Revise las observaciones del agua en las tierras agrícolas bajas antes de utilizar equipos.",
+                    "Compruebe los canales de drenaje y caminos agrícolas después de las lluvias.",
+                    "Planifique la cosecha y el transporte según el estado de las carreteras y las actualizaciones del agua."
+                ],
+                tourist: [
+                    "Consulte el estado de los caminos rurales cercanos a las llanuras fluviales.",
+                    "Aléjese de las riberas y de las zonas bajas donde puede acumularse agua.",
+                    "Utilice cruces autorizados y no atraviese carreteras afectadas por el agua."
+                ],
+                resident: [
+                    "Consulte las actualizaciones del agua en terrenos bajos y carreteras que conectan las comunidades.",
+                    "Identifique una ruta alternativa hacia los servicios esenciales si las carreteras resultan afectadas.",
+                    "Siga las alertas oficiales y evite cruzar zonas con agua acumulada."
+                ]
+            }
+        };
+
+        async function fetchAnalysis() {
+            const listEl = document.getElementById('rec-list');
+            listEl.innerHTML = `<li class="p-3 rounded-xl bg-slate-800/70 text-cyan-400 animate-pulse">${currentLang === 'ar' ? 'جاري تحليل بيانات الحوض...' : 'Analyzing basin data...'}</li>`;
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ basinId: currentBasin, role: currentRole, lang: currentLang === 'es' ? 'en' : currentLang })
+                });
+                const data = await res.json();
+
+                document.getElementById('basin-badge').textContent = data.basinName;
+                document.getElementById('story-text').textContent = data.story;
+                document.getElementById('source-mode').textContent = data.dataAvailable ? 'NASA NISAR GCOV' : (currentLang === 'ar' ? 'بانتظار ملف نتائج NASA' : 'Waiting for NASA results');
+
+                document.getElementById('metric-flow').textContent = data.metrics.new_open_water_km2 === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.new_open_water_km2 + ' km²';
+                document.getElementById('metric-slope').textContent = data.metrics.mean_slope_deg === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.mean_slope_deg + '°';
+                document.getElementById('metric-risk').textContent = data.metrics.flooded_percent === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.flooded_percent + '%';
+
+                const roleNames = {
+                    ar: { farmer: 'للمزارعين', tourist: 'للسياح والزوار', resident: 'للسكان المحليين' },
+                    en: { farmer: 'for Farmers', tourist: 'for Tourists', resident: 'for Residents' },
+                    es: { farmer: 'para agricultores', tourist: 'para turistas', resident: 'para residentes' }
+                };
+                document.getElementById('rec-title').textContent = currentLang === 'es'
+                    ? 'Orientaciones generales ' + roleNames.es[currentRole] + ' en ' + data.basinName + ':'
+                    : currentLang === 'ar'
+                    ? `إرشادات عامة ${roleNames.ar[currentRole]} في ${data.basinName}:`
+                    : `General guidance ${roleNames.en[currentRole]} in ${data.basinName}:`;
+
+                listEl.innerHTML = '';
+                const basinGuidance = {
+  babahoyo: {
+    farmer: {
+      ar: ["راجع مناطق المياه المرصودة حول الحقول المنخفضة قبل الري أو تحريك المعدات.", "تابع المصارف وقنوات التصريف بعد الأمطار.", "خطط لنقل المحاصيل عبر طرق آمنة بعيدًا عن مناطق تجمع المياه."],
+      en: ["Review observed water areas around low-lying fields before irrigation or moving equipment.", "Monitor drains and drainage channels after rainfall.", "Plan crop transport on safer routes away from water-accumulation areas."]
+    },
+    tourist: {
+      ar: ["تحقق من الطرق القريبة من السهول النهرية قبل الرحلة.", "ابتعد عن ضفاف الأنهار ومناطق تجمع المياه عند صدور تحذيرات.", "اتبع تعليمات الجهات المحلية واختر نقاط توقف آمنة."],
+      en: ["Check roads near the river plains before travelling.", "Keep away from riverbanks and standing-water areas when alerts are issued.", "Follow local instructions and choose safe stopping points."]
+    },
+    resident: {
+      ar: ["تابع تحديثات المياه في المناطق السكنية المنخفضة.", "تعرّف على طرق الخروج الآمنة ونقاط التجمع الرسمية.", "لا تعبر الطرق المغمورة بالمياه."],
+      en: ["Monitor water updates in low-lying residential areas.", "Know the safe exit routes and official assembly points.", "Never cross flooded roads."]
+    }
+  },
+  lower_guayas: {
+    farmer: {
+      ar: ["قيّم الحقول وشبكات الصرف مع مراعاة الجريان القادم من مناطق أعلى الحوض.", "نسّق توقيت الري والصرف وفق تغير مناسيب المياه.", "تحقق من ملوحة المياه والتربة محليًا قبل استخدام المياه الساحلية للري."],
+      en: ["Assess fields and drainage networks while accounting for runoff from upstream areas.", "Coordinate irrigation and drainage with local water-level changes.", "Check local water and soil salinity before using coastal water for irrigation."]
+    },
+    tourist: {
+      ar: ["تحقق من الطرق القريبة من المصبات والمناطق الساحلية.", "راجع تنبيهات الأمطار والمد والجزر قبل التنقل.", "التزم بالممرات المسموح بها وابتعد عن حواف القنوات."],
+      en: ["Check roads near outlets and coastal areas.", "Review rainfall and tide advisories before travelling.", "Stay on permitted routes and keep clear of channel edges."]
+    },
+    resident: {
+      ar: ["تابع مناسيب المياه في المناطق المنخفضة وتأثير الجريان القادم من أعلى الحوض.", "راجع تنبيهات الأمطار والمد والجزر قبل استخدام الطرق الساحلية.", "احتفظ بخطة انتقال إلى مناطق أعلى عند صدور تعليمات رسمية."],
+      en: ["Monitor water levels in low-lying communities and runoff arriving from upstream.", "Check rainfall and tide advisories before using coastal roads.", "Have a plan to move to higher ground if authorities issue instructions."]
+    }
+  },
+  daule: {
+    farmer: {
+      ar: ["قارن تغير المسطحات المائية المرصودة بحالة قنوات الري والصرف.", "تابع المناطق القريبة من المجاري المائية ومعابر المعدات بعد الأمطار.", "نسّق توزيع مياه الري مع الجهات المحلية."],
+      en: ["Compare observed water-extent changes with irrigation and drainage channel conditions.", "Monitor areas near waterways and equipment crossings after rainfall.", "Coordinate irrigation-water distribution with local authorities."]
+    },
+    tourist: {
+      ar: ["تحقق من حالة الطرق والجسور القريبة من مجاري المياه.", "تجنب الأنشطة قرب القنوات والضفاف عند ارتفاع المياه أو صدور تنبيهات.", "اتبع الإرشادات المحلية بشأن الوصول إلى المناطق الترفيهية."],
+      en: ["Check roads and bridges near waterways.", "Avoid activities near channels and riverbanks during high water or local alerts.", "Follow local guidance on access to recreational areas."]
+    },
+    resident: {
+      ar: ["تابع تغيرات المياه بالقرب من الأحياء والطرق المتصلة بنهر Daule.", "تعرّف على الطرق البديلة إذا تأثرت المعابر أو الشوارع القريبة من القنوات.", "تجنب الطرق التي تصدر الجهات المحلية تحذيرات بشأنها."],
+      en: ["Monitor water changes near communities and roads connected to the Daule River.", "Know alternative routes if crossings or streets near channels are affected.", "Avoid roads that local authorities have flagged as unsafe."]
+    }
+  },
+  vinces: {
+    farmer: {
+      ar: ["راجع رصد المياه في الأراضي الزراعية المنخفضة قبل تشغيل المعدات.", "افحص قنوات التصريف والممرات الزراعية بعد الأمطار.", "خطط للحصاد والنقل وفق حالة الطرق وتحديثات المياه."],
+      en: ["Review water observations over low-lying farmland before operating equipment.", "Check drainage channels and farm tracks after rainfall.", "Plan harvesting and transport around road conditions and water updates."]
+    },
+    tourist: {
+      ar: ["تحقق من حالة الطرق الريفية القريبة من السهول النهرية.", "ابتعد عن الضفاف والمناطق المنخفضة التي قد تتجمع فيها المياه.", "استخدم نقاط عبور معتمدة ولا تعبر الطرق المتأثرة بالمياه."],
+      en: ["Check rural roads near the river plains.", "Keep away from riverbanks and low-lying areas where water may collect.", "Use approved crossings and do not cross water-affected roads."]
+    },
+    resident: {
+      ar: ["تابع تحديثات المياه في الأراضي المنخفضة والطرق بين التجمعات السكنية.", "حدد مسارًا بديلًا للوصول إلى الخدمات الأساسية إذا تأثرت الطرق.", "اتبع التنبيهات الرسمية وتجنب عبور المياه المتجمعة."],
+      en: ["Monitor water updates for low-lying land and roads connecting communities.", "Identify an alternative route to essential services if roads are affected.", "Follow official alerts and avoid crossing accumulated water."]
+    }
+  }
+};
+
+document.querySelector('[data-i18n="ai-recs"]').textContent = currentLang === 'es' ? 'Orientaciones específicas de la cuenca' :
+  currentLang === 'ar' ? 'إرشادات مخصصة حسب الحوض' : 'Basin-Specific Guidance';
+
+const recommendationsToShow = currentLang === 'es' ? (spanishGuidance[currentBasin]?.[currentRole] || data.recommendations) : (basinGuidance[currentBasin]?.[currentRole]?.[currentLang] || data.recommendations);
+
+recommendationsToShow.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'p-3 rounded-xl bg-slate-800/70 border border-slate-700/80 leading-relaxed';
+                    li.textContent = item;
+                    listEl.appendChild(li);
+                });
+            } catch (err) {
+                listEl.innerHTML = `<li class="p-3 rounded-xl bg-red-950/50 text-red-400">Error connecting to server. Make sure Node server is running!</li>`;
+            }
+        }
+
+        async function fetchGov() {
+            const container = document.getElementById('gov-cards');
+            container.innerHTML = `<div class="col-span-2 p-6 text-center text-cyan-400 animate-pulse">${currentLang === 'ar' ? 'جاري توليد التوصيات الاستراتيجية...' : 'Generating strategic recommendations...'}</div>`;
+
+            try {
+                const res = await fetch('/api/government', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ season: currentSeason, lang: currentLang === 'es' ? 'en' : currentLang })
+                });
+                const data = await res.json();
+
+                container.innerHTML = '';
+                data.cards.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-800/70 rounded-xl p-6 border border-slate-700 flex flex-col justify-between';
+                    div.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400">${card.basin}</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400">${card.impact}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-2">${card.title}</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">${card.desc}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
+                            <span>${currentLang === 'ar' ? 'حالة التنفيذ: مقترح هندسي' : 'Status: Planning Proposal'}</span>
+                            <span class="text-amber-400 font-bold">${currentLang === 'ar' ? 'إرشادات تخطيطية مستندة إلى مؤشرات الرصد' : 'Planning Guidance Informed by Observed Indicators'}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                container.innerHTML = `<div class="col-span-2 p-6 text-center text-red-400">Failed to load government data.</div>`;
+            }
+        }
+
+        // Initial load
+        fetchAnalysis();
+    </script>
+
+<script>
+(function () {
+  "use strict";
+
+  const FILES = {
+    polygons: "/data/nasa/basins.geojson",
+    rivers: "/data/reference/hydrorivers/guayas_rivers.geojson"
+  };
+
+  const PFAF = {
+    "67202300": "daule",
+    "67202210": "babahoyo",
+    "67202230": "vinces",
+    "67202100": "lower_guayas"
+  };
+
+  const STORIES = {
+    babahoyo: {
+      en: "The Babahoyo system receives runoff from a broad upstream catchment and connected tributaries. During prolonged heavy rainfall, river levels can rise and water can spread across low-gradient floodplain areas. Flood impacts depend on rainfall distribution, upstream inflows, and downstream river levels.",
+      ar: "\u064a\u0633\u062a\u0642\u0628\u0644 \u0646\u0638\u0627\u0645 \u0646\u0647\u0631 \u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648 \u0645\u064a\u0627\u0647 \u0627\u0644\u062c\u0631\u064a\u0627\u0646 \u0627\u0644\u0633\u0637\u062d\u064a \u0645\u0646 \u062d\u0648\u0636 \u062a\u0635\u0631\u064a\u0641 \u0648\u0627\u0633\u0639 \u0648\u0631\u0648\u0627\u0641\u062f \u0645\u062a\u0635\u0644\u0629 \u0628\u0647. \u0648\u0645\u0639 \u0627\u0633\u062a\u0645\u0631\u0627\u0631 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u063a\u0632\u064a\u0631\u0629\u060c \u0642\u062f \u062a\u0631\u062a\u0641\u0639 \u0645\u0646\u0627\u0633\u064a\u0628 \u0627\u0644\u0646\u0647\u0631 \u0648\u062a\u0646\u062a\u0634\u0631 \u0627\u0644\u0645\u064a\u0627\u0647 \u0641\u064a \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0633\u0647\u0644 \u0627\u0644\u0641\u064a\u0636\u064a \u0645\u0646\u062e\u0641\u0636\u0629 \u0627\u0644\u0627\u0646\u062d\u062f\u0627\u0631. \u0648\u062a\u062a\u0623\u062b\u0631 \u0634\u062f\u0629 \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0628\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0648\u062a\u062f\u0641\u0642\u0627\u062a \u0627\u0644\u0631\u0648\u0627\u0641\u062f \u0648\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0645\u064a\u0627\u0647."
+    },
+    daule: {
+      en: "The Daule basin collects runoff from a large network of tributaries. Heavy rainfall across the catchment can increase river discharge, while low-gradient downstream reaches may slow drainage. Flood conditions are influenced by upstream rainfall and water levels near the Daule-Babahoyo confluence.",
+      ar: "\u064a\u062c\u0645\u0639 \u062d\u0648\u0636 \u0646\u0647\u0631 \u062f\u0627\u0648\u0644\u064a \u0645\u064a\u0627\u0647 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0639\u0628\u0631 \u0634\u0628\u0643\u0629 \u0648\u0627\u0633\u0639\u0629 \u0645\u0646 \u0627\u0644\u0631\u0648\u0627\u0641\u062f. \u0648\u0642\u062f \u062a\u0624\u062f\u064a \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u063a\u0632\u064a\u0631\u0629 \u0641\u064a \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u062d\u0648\u0636 \u0625\u0644\u0649 \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0646\u0647\u0631\u064a\u060c \u0628\u064a\u0646\u0645\u0627 \u0642\u062f \u062a\u0624\u062f\u064a \u0627\u0644\u0645\u0646\u0627\u0637\u0642 \u0645\u0646\u062e\u0641\u0636\u0629 \u0627\u0644\u0627\u0646\u062d\u062f\u0627\u0631 \u0642\u0631\u0628 \u0627\u0644\u0645\u0635\u0628 \u0625\u0644\u0649 \u0625\u0628\u0637\u0627\u0621 \u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0645\u064a\u0627\u0647. \u0648\u062a\u062a\u0623\u062b\u0631 \u0638\u0631\u0648\u0641 \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0628\u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0648\u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647 \u0642\u0631\u0628 \u0646\u0642\u0637\u0629 \u0627\u0644\u062a\u0642\u0627\u0621 \u062f\u0627\u0648\u0644\u064a \u0648\u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648."
+    },
+    vinces: {
+      en: "The Vinces river system drains its own upstream catchment before joining the wider Babahoyo river network. Intense rainfall can generate runoff into tributaries and raise river levels. Flooding can become more extensive where high flows meet low-lying floodplain areas and downstream water levels are elevated.",
+      ar: "\u064a\u0635\u0631\u0641 \u0646\u0638\u0627\u0645 \u0646\u0647\u0631 \u0641\u064a\u0646\u0633\u064a\u0633 \u0645\u064a\u0627\u0647 \u062d\u0648\u0636\u0647 \u0642\u0628\u0644 \u0627\u062a\u0635\u0627\u0644\u0647 \u0628\u0634\u0628\u0643\u0629 \u0646\u0647\u0631 \u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648 \u0627\u0644\u0623\u0648\u0633\u0639. \u0648\u064a\u0645\u0643\u0646 \u0644\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u0634\u062f\u064a\u062f\u0629 \u0623\u0646 \u062a\u0632\u064a\u062f \u0627\u0644\u062c\u0631\u064a\u0627\u0646 \u0627\u0644\u0633\u0637\u062d\u064a \u0641\u064a \u0627\u0644\u0631\u0648\u0627\u0641\u062f \u0648\u062a\u0631\u0641\u0639 \u0645\u0646\u0633\u0648\u0628 \u0627\u0644\u0646\u0647\u0631. \u0648\u0642\u062f \u064a\u0645\u062a\u062f \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0641\u064a \u0627\u0644\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0645\u0646\u062e\u0641\u0636\u0629 \u0639\u0646\u062f\u0645\u0627 \u062a\u062a\u0632\u0627\u0645\u0646 \u0627\u0644\u062a\u062f\u0641\u0642\u0627\u062a \u0627\u0644\u0645\u0631\u062a\u0641\u0639\u0629 \u0645\u0639 \u0627\u0631\u062a\u0641\u0627\u0639 \u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647."
+    },
+    lower_guayas: {
+      en: "The Lower Guayas is a downstream river system connected to the Daule and Babahoyo confluence. High upstream discharge can increase water levels through the lower river corridor. Near the estuary, tidal conditions may also influence how quickly river water drains. This catchment is cumulative and should not be interpreted as an independent upstream basin.",
+      ar: "\u064a\u0645\u062b\u0644 \u062d\u0648\u0636 \u063a\u0648\u0627\u064a\u0627\u0633 \u0627\u0644\u0633\u0641\u0644\u064a \u0646\u0638\u0627\u0645\u064b\u0627 \u0646\u0647\u0631\u064a\u064b\u0627 \u064a\u0631\u062a\u0628\u0637 \u0628\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u062a\u0642\u0627\u0621 \u0646\u0647\u0631\u064a \u062f\u0627\u0648\u0644\u064a \u0648\u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648. \u0648\u064a\u0645\u0643\u0646 \u0644\u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0642\u0627\u062f\u0645 \u0645\u0646 \u0623\u0639\u0644\u0649 \u0627\u0644\u062d\u0648\u0636 \u0623\u0646 \u062a\u0631\u0641\u0639 \u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647 \u0641\u064a \u0627\u0644\u0645\u062c\u0631\u0649 \u0627\u0644\u0633\u0641\u0644\u064a. \u0648\u0628\u0627\u0644\u0642\u0631\u0628 \u0645\u0646 \u0627\u0644\u0645\u0635\u0628\u060c \u0642\u062f \u062a\u0624\u062b\u0631 \u062d\u0631\u0643\u0629 \u0627\u0644\u0645\u062f \u0648\u0627\u0644\u062c\u0632\u0631 \u0623\u064a\u0636\u064b\u0627 \u0641\u064a \u0633\u0631\u0639\u0629 \u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0645\u064a\u0627\u0647. \u0648\u0647\u0630\u0627 \u0627\u0644\u062d\u0648\u0636 \u062a\u0631\u0627\u0643\u0645\u064a\u060c \u0644\u0630\u0644\u0643 \u0644\u0627 \u064a\u0646\u0628\u063a\u064a \u0627\u0639\u062a\u0628\u0627\u0631\u0647 \u062d\u0648\u0636\u064b\u0627 \u0645\u0633\u062a\u0642\u0644\u064b\u0627 \u0639\u0646 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0639\u0644\u064a\u0627."
+    }
+  };
+
+  const STORIES_ES = {
+    babahoyo: "El sistema del Babahoyo recibe escorrentía de una amplia cuenca aguas arriba y de sus afluentes conectados. Durante periodos prolongados de lluvias intensas, el nivel del río puede aumentar y el agua puede extenderse por zonas de llanura aluvial con poca pendiente. Los impactos de las inundaciones dependen de la distribución de las lluvias, los aportes aguas arriba y los niveles del río aguas abajo.",
+    daule: "La cuenca del Daule recoge la escorrentía de una extensa red de afluentes. Las lluvias intensas en toda la cuenca pueden aumentar el caudal del río, mientras que los tramos aguas abajo con poca pendiente pueden ralentizar el drenaje. Las condiciones de inundación están influidas por las lluvias aguas arriba y los niveles de agua cerca de la confluencia de los ríos Daule y Babahoyo.",
+    vinces: "El sistema fluvial del Vinces drena su propia cuenca aguas arriba antes de unirse a la red fluvial más amplia del Babahoyo. Las lluvias intensas pueden generar escorrentía hacia los afluentes y elevar los niveles del río. Las inundaciones pueden extenderse más cuando los caudales elevados coinciden con llanuras aluviales bajas y niveles altos de agua aguas abajo.",
+    lower_guayas: "El Guayas inferior es un sistema fluvial aguas abajo conectado con la confluencia de los ríos Daule y Babahoyo. Los grandes caudales procedentes de aguas arriba pueden elevar los niveles de agua a lo largo del corredor fluvial inferior. Cerca del estuario, las mareas también pueden influir en la rapidez con que se drena el agua del río. Esta cuenca integra aportes acumulados y no debe interpretarse como una cuenca independiente de aguas arriba."
+  };
+
+  let map, riverLayer, basinLayer, polygonData, riverData;
+  let selectedBasin = "babahoyo";
+  let mapReady = false;
+
+  function normalizeBasin(value) {
+    const v = String(value || "").toLowerCase().replace(/[\s-]+/g, "_");
+    if (v.includes("lower") || v.includes("guayas")) return "lower_guayas";
+    if (v.includes("babahoyo")) return "babahoyo";
+    if (v.includes("vinces")) return "vinces";
+    if (v.includes("daule")) return "daule";
+    return v;
+  }
+
+  function arabicMode() {
+    const root = document.documentElement;
+    return root.dir === "rtl" ||
+      (root.lang || "").toLowerCase().startsWith("ar") ||
+      document.body.dir === "rtl";
+  }
+
+  function updateStory(basin) {
+    const el = document.getElementById("story-text");
+    const story = STORIES[normalizeBasin(basin || selectedBasin)];
+    if (el && story) el.textContent = (document.documentElement.lang || 'en').startsWith('ar') ? story.ar : ((document.documentElement.lang || 'en').startsWith('es') ? STORIES_ES[normalizeBasin(basin || selectedBasin)] : story.en);
+  }
+
+  function loadLeaflet() {
+    return new Promise((resolve, reject) => {
+      if (window.L) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+      script.crossOrigin = "";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Leaflet failed to load"));
+      document.head.appendChild(script);
+    });
+  }
+
+  function pfafOf(feature) {
+    const p = feature.properties || {};
+    return String(p.pfaf_id || p.PFAF_ID || "").replace(/\.0$/, "");
+  }
+
+  function drawBasin(basin) {
+    if (!map || !polygonData || !riverData) return;
+    selectedBasin = normalizeBasin(basin);
+
+    if (riverLayer) map.removeLayer(riverLayer);
+    if (basinLayer) map.removeLayer(basinLayer);
+
+    const selectedPfaf = Object.keys(PFAF).find(k => PFAF[k] === selectedBasin);
+
+    const polygons = {
+      type: "FeatureCollection",
+      features: polygonData.features.filter(f => pfafOf(f) === selectedPfaf)
+    };
+
+    const rivers = {
+      type: "FeatureCollection",
+      features: riverData.features.filter(
+        f => normalizeBasin(f.properties && f.properties.basinId) === selectedBasin
+      )
+    };
+
+    basinLayer = L.geoJSON(polygons, {
+      style: { color: "#d97706", weight: 2.5, fillColor: "#fbbf24", fillOpacity: 0.12 }
+    }).addTo(map);
+
+    riverLayer = L.geoJSON(rivers, {
+      style: feature => {
+        const order = Number(feature.properties && feature.properties.streamOrder || 1);
+        return {
+          color: order >= 4 ? "#075985" : "#0ea5e9",
+          weight: order >= 4 ? 3.2 : 2,
+          opacity: 0.9,
+          className: "river-flow-line"
+        };
+      }
+    }).addTo(map);
+
+    const bounds = L.featureGroup([basinLayer, riverLayer]).getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [18, 18], maxZoom: 10 });
+    updateStory(selectedBasin);
+  }
+
+  async function initializeMap() {
+    const container = document.getElementById("basin-map");
+    if (!container) return;
+
+    try {
+      await loadLeaflet();
+
+      const responses = await Promise.all([
+        fetch(FILES.polygons),
+        fetch(FILES.rivers)
+      ]);
+
+      if (!responses.every(r => r.ok)) {
+        throw new Error("GeoJSON files could not be loaded");
+      }
+
+      [polygonData, riverData] = await Promise.all(responses.map(r => r.json()));
+
+      map = L.map(container, { scrollWheelZoom: false });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+
+      mapReady = true;
+      drawBasin(selectedBasin);
+      setTimeout(() => map && map.invalidateSize(), 250);
+
+    } catch (error) {
+      console.error("HydroVision map error:", error);
+      container.innerHTML =
+        '<div style="padding:18px;color:#334155;">Map could not load. Check internet access and GeoJSON file paths.</div>';
+    }
+  }
+
+  function connectControls() {
+    if (typeof window.setBasin === "function" && !window.setBasin.__hydroWrapped) {
+      const original = window.setBasin;
+      const wrapped = function (basin) {
+        selectedBasin = normalizeBasin(basin);
+        updateStory(selectedBasin);
+        const result = original.apply(this, arguments);
+        if (mapReady) drawBasin(selectedBasin);
+        if (result && typeof result.then === "function") {
+          return result.then(value => {
+            updateStory(selectedBasin);
+            return value;
+          });
+        }
+        updateStory(selectedBasin);
+        return result;
+      };
+      wrapped.__hydroWrapped = true;
+      window.setBasin = wrapped;
+    }
+
+    if (typeof window.fetchAnalysis === "function" && !window.fetchAnalysis.__hydroWrapped) {
+      const original = window.fetchAnalysis;
+      const wrapped = async function () {
+        const result = await original.apply(this, arguments);
+        updateStory(selectedBasin);
+        return result;
+      };
+      wrapped.__hydroWrapped = true;
+      window.fetchAnalysis = wrapped;
+    }
+
+    ["setLanguage", "toggleLanguage", "changeLanguage"].forEach(name => {
+      if (typeof window[name] === "function" && !window[name].__hydroWrapped) {
+        const original = window[name];
+        const wrapped = function () {
+          const result = original.apply(this, arguments);
+          updateStory(selectedBasin);
+          return result;
+        };
+        wrapped.__hydroWrapped = true;
+        window[name] = wrapped;
+      }
+    });
+
+    new MutationObserver(() => updateStory(selectedBasin)).observe(
+      document.documentElement,
+      { attributes: true, attributeFilter: ["dir", "lang"] }
+    );
+  }
+
+  function start() {
+    connectControls();
+    updateStory(selectedBasin);
+    initializeMap();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+
+  window.hydroVisionUpdateBasinMap = function (basin) {
+    selectedBasin = normalizeBasin(basin);
+    if (mapReady) drawBasin(selectedBasin);
+    else updateStory(selectedBasin);
+  };
+})();
+</script>
+
+
+<script id="hv-theme-controller">
+(function () {
+    "use strict";
+
+    var root = document.documentElement;
+    var key = "hydrovision-theme";
+    var theme = "dark";
+
+    try {
+        var saved = localStorage.getItem(key);
+        if (saved === "light" || saved === "dark") {
+            theme = saved;
+        }
+    } catch (e) {}
+
+    function applyTheme(nextTheme) {
+        theme = nextTheme === "light" ? "light" : "dark";
+        root.setAttribute("data-hv-theme", theme);
+
+        var button = document.getElementById("hv-theme-toggle");
+
+        if (button) {
+            var icon = button.querySelector(".hv-theme-icon");
+            var label = button.querySelector(".hv-theme-label");
+
+            if (icon) {
+                icon.textContent = theme === "dark" ? "☀" : "☾";
+            }
+
+            if (label) {
+                label.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+            }
+
+            button.setAttribute(
+                "aria-label",
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            );
+
+            button.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
+        }
+
+        try {
+            localStorage.setItem(key, theme);
+        } catch (e) {}
+    }
+
+    applyTheme(theme);
+
+    var button = document.createElement("button");
+    button.id = "hv-theme-toggle";
+    button.type = "button";
+    button.innerHTML =
+        '<span class="hv-theme-icon" aria-hidden="true"></span>' +
+        '<span class="hv-theme-label"></span>';
+
+    button.addEventListener("click", function () {
+        applyTheme(theme === "dark" ? "light" : "dark");
+    });
+
+    document.body.appendChild(button);
+    applyTheme(theme);
+})();
+</script>
+
+<script id="hv-evidence-features-script">
+/* HV_EVIDENCE_FEATURES_I18N_V2 */
+(function () {
+    "use strict";
+
+    const section = document.getElementById("hv-evidence-section");
+    if (!section) return;
+
+    let latest = null;
+
+    const translations = {
+        ar: {
+            title: "الأدلة العلمية ومستكشف التأثير",
+            subtitle: "استكشف البيانات والمنهجية والنتائج الخاصة بالحوض المختار.",
+            status: "نتائج التحليل",
+            evidence: "الأدلة العلمية",
+            mission: "المهمة الفضائية",
+            product: "المنتج",
+            event: "تاريخ رصد الحدث",
+            baseline: "فترة البحث عن خط الأساس",
+            pol: "قنوات الاستقطاب",
+            method: "المنهج",
+            methodValue: "مقارنة رصد الحدث بخط الأساس باستخدام التصنيف بالعتبات",
+            terrain: "مصدر بيانات التضاريس",
+            validation: "يعرض التحليل التغيرات المكانية المستخرجة من بيانات الأقمار الصناعية.",
+            nisarLink: "مهمة NASA NISAR",
+            asfLink: "البحث عن بيانات ASF",
+            thresholds: "عتبات التصنيف",
+            water: "عتبة المياه المفتوحة الجديدة",
+            vegChange: "عتبة تغير الغطاء النباتي",
+            hv: "عتبة HV للغطاء النباتي",
+            sampling: "خطوة أخذ العينات في المعالجة",
+            thresholdNote: "تُستخدم عتبات التصنيف لتمييز المياه المفتوحة والتغيرات في الغطاء النباتي.",
+            change: "خريطة تصنيف الحدث",
+            changeDesc: "هذه خريطة ناتج التصنيف المتاح من مقارنة الحدث بفترة الأساس، وليست صورتين فضائيتين خام قبل وبعد.",
+            legendWater: "1 — مياه مفتوحة جديدة",
+            legendVeg: "2 — مؤشر غمر الغطاء النباتي",
+            legendOther: "0 — فئات أخرى",
+            legendInvalid: "255 — بيانات غير صالحة",
+            mapNote: "تعرض الخريطة نتائج مقارنة رصد الحدث بفترة خط الأساس.",
+            download: "تحميل ملف GeoTIFF للتصنيف",
+            impact: "ملخص النتائج المكانية",
+            total: "إجمالي المساحة المصنفة الجديدة (كم²)",
+            percent: "النسبة من مساحة المشهد الصالحة",
+            open: "المياه المفتوحة الجديدة (كم²)",
+            vegetation: "مؤشر غمر الغطاء النباتي (كم²)",
+            impactLimit: "تُعرض مؤشرات التحليل المكاني للأحواض المختارة.",
+            coverage: "تغطية المشهد:",
+            ask: "اسأل الأرض",
+            askSub: "مساعد قائم على قواعد ثابتة لشرح بيانات المشروع الحالية، ولا يقدم تنبؤات ذكاء اصطناعي.",
+            assistantBadge: "مساعد قائم على قواعد",
+            placeholder: "اسأل عن الخريطة أو المساحة أو المنهج أو حدود البيانات...",
+            askButton: "اسأل",
+            areaButton: "ملخص المساحة",
+            methodButton: "كيف تم القياس؟",
+            limitsButton: "ما حدود البيانات؟",
+            sectorsButton: "الزراعة والمدن",
+            initialAnswer: "اختَر سؤالًا مقترحًا أو اكتب سؤالك.",
+            disclaimer: "",
+            noData: "لا تتوفر بيانات لهذا الحوض في الاستجابة الحالية.",
+            noMetric: "غير متاح",
+            mapError: "صورة الخريطة غير متاحة حاليًا من الخادم المحلي.",
+            answerArea: "في الحوض المحدد، المساحة المصنفة الجديدة تساوي {total} كم². منها {open} كم² مياه مفتوحة جديدة و{veg} كم² مؤشر غمر نباتي. النسبة من مساحة المشهد الصالحة: {percent}%. تعرض هذه القيم المساحات الناتجة عن تصنيف بيانات الأقمار الصناعية.",
+            answerMethod: "تستخدم الدراسة منتج NASA NISAR Level-2 GCOV، وتقارن رصد الحدث بتاريخ 31 أكتوبر 2026 بنافذة بحث لخط أساس جاف من 1 يونيو إلى 15 أكتوبر 2026. تُستخدم عتبات لتصنيف المياه المفتوحة وتغيرات الغطاء النباتي. النتائج تحتاج إلى تحقق ميداني مستقل.",
+            answerLimits: "توضح النتائج المساحات المصنفة ونسبة التغير المكاني داخل كل حوض.",
+            answerSectors: "يمكن دمج نتائج التصنيف المكاني مع بيانات الزراعة والعمران والأنشطة التجارية لتطوير مؤشرات قطاعية.",
+            answerSource: "المصدر الفضائي هو NASA NISAR Level-2 GCOV. ملفات المشروع تشير إلى قنوات HH وHV، وإلى استخدام Copernicus DEM GLO-30 لخصائص التضاريس. روابط المصدر موجودة في بطاقة الأدلة العلمية.",
+            answerDefault: "أستطيع شرح المساحة المصنفة، والمنهج والعتبات، وحدود البيانات، وما ينقص لحساب التأثير على القطاعات. جرّب أحد الأزرار المقترحة."
+        },
+
+        en: {
+            title: "Scientific Evidence & Impact Explorer",
+            subtitle: "Explore the evidence, method, and results for the selected basin.",
+            status: "Provisional estimates",
+            evidence: "Scientific evidence",
+            mission: "Mission",
+            product: "Product",
+            event: "Event acquisition",
+            baseline: "Baseline search window",
+            pol: "Polarimetric channels",
+            method: "Method",
+            methodValue: "Event-versus-baseline threshold classification",
+            terrain: "Terrain source",
+            validation: "The analysis presents spatial changes derived from satellite observations.",
+            nisarLink: "NASA NISAR mission",
+            asfLink: "ASF data search",
+            thresholds: "Classification thresholds",
+            water: "New open-water threshold",
+            vegChange: "Vegetation-change threshold",
+            hv: "Vegetation HV threshold",
+            sampling: "Processing sampling step",
+            thresholdNote: "Classification thresholds distinguish open water and vegetation changes.",
+            change: "Event classification map",
+            changeDesc: "This is the available classified output from the event-versus-baseline analysis, not a pair of raw before-and-after satellite images.",
+            legendWater: "1 — New open water",
+            legendVeg: "2 — Flooded vegetation proxy",
+            legendOther: "0 — Other",
+            legendInvalid: "255 — No data",
+            mapNote: "The map presents the comparison between the event observation and the baseline period.",
+            download: "Download classification GeoTIFF",
+            impact: "Impact snapshot",
+            total: "Total classified new area (km²)",
+            percent: "Share of valid scene area",
+            open: "New open water (km²)",
+            vegetation: "Flooded vegetation proxy (km²)",
+            impactLimit: "Spatial analysis indicators are presented for the selected river basins.",
+            coverage: "Scene coverage:",
+            ask: "Ask Earth",
+            askSub: "A rule-based guide to the current project data. It does not generate AI predictions.",
+            assistantBadge: "RULE-BASED ASSISTANT",
+            placeholder: "Ask about the map, area, method, or limitations...",
+            askButton: "Ask",
+            areaButton: "Area summary",
+            methodButton: "How was it measured?",
+            limitsButton: "What are the limitations?",
+            sectorsButton: "Agriculture and cities",
+            initialAnswer: "Choose a suggested question or type your own.",
+            disclaimer: "Answers are based on available project fields and fixed rules. They are not official warnings or professional advice.",
+            noData: "No data is available for this basin in the current response.",
+            noMetric: "N/A",
+            mapError: "Map image is currently unavailable from the local server.",
+            answerArea: "For the selected basin, the classified new area is {total} km²: {open} km² of new open water and {veg} km² of flooded-vegetation proxy. The share of valid scene area is {percent}%. These values represent areas identified by satellite-data classification.",
+            answerMethod: "The study uses NASA NISAR Level-2 GCOV and compares the 31 October 2026 event observation with a dry-baseline search window from 1 June to 15 October 2026. Thresholds classify new open water and vegetation changes. Independent validation is still required.",
+            answerLimits: "The results describe classified areas and their share of the valid observation area.",
+            answerSectors: "The spatial results can be combined with agricultural, urban, and commercial datasets to develop sector-specific indicators.",
+            answerSource: "The satellite source is NASA NISAR Level-2 GCOV. Project metadata identifies HH and HV channels and Copernicus DEM GLO-30 for terrain variables. Source links are available in the scientific evidence card.",
+            answerDefault: "I can explain classified area, the method and thresholds, data limitations, and what is needed to estimate sector exposure. Try one of the suggested questions."
+        },
+
+        es: {
+            title: "Explorador de evidencia científica e impacto",
+            subtitle: "Explora los datos, el método y los resultados de la cuenca seleccionada.",
+            status: "Estimaciones provisionales",
+            evidence: "Evidencia científica",
+            mission: "Misión",
+            product: "Producto",
+            event: "Adquisición del evento",
+            baseline: "Ventana de búsqueda de referencia",
+            pol: "Canales polarimétricos",
+            method: "Método",
+            methodValue: "Clasificación por umbrales entre el evento y la referencia",
+            terrain: "Fuente topográfica",
+            validation: "El análisis presenta cambios espaciales derivados de observaciones satelitales.",
+            nisarLink: "Misión NASA NISAR",
+            asfLink: "Búsqueda de datos ASF",
+            thresholds: "Umbrales de clasificación",
+            water: "Umbral de agua abierta nueva",
+            vegChange: "Umbral de cambio de vegetación",
+            hv: "Umbral HV de vegetación",
+            sampling: "Paso de muestreo del procesamiento",
+            thresholdNote: "Los umbrales de clasificación distinguen el agua abierta y los cambios en la vegetación.",
+            change: "Mapa de clasificación del evento",
+            changeDesc: "Este es el resultado clasificado de la comparación entre el evento y la referencia, no dos imágenes satelitales originales de antes y después.",
+            legendWater: "1 — Agua abierta nueva",
+            legendVeg: "2 — Indicador de vegetación inundada",
+            legendOther: "0 — Otros",
+            legendInvalid: "255 — Sin datos",
+            mapNote: "El mapa presenta la comparación entre el evento y el período de referencia.",
+            download: "Descargar GeoTIFF de clasificación",
+            impact: "Resumen del impacto",
+            total: "Área nueva clasificada total (km²)",
+            percent: "Porcentaje del área válida",
+            open: "Agua abierta nueva (km²)",
+            vegetation: "Indicador de vegetación inundada (km²)",
+            impactLimit: "Se presentan indicadores de análisis espacial para las cuencas seleccionadas.",
+            coverage: "Cobertura de escena:",
+            ask: "Pregunta a Earth",
+            askSub: "Asistente basado en reglas fijas; no genera predicciones de inteligencia artificial.",
+            assistantBadge: "ASISTENTE BASADO EN REGLAS",
+            placeholder: "Pregunta sobre el mapa, el área, el método o sus límites...",
+            askButton: "Preguntar",
+            areaButton: "Resumen del área",
+            methodButton: "¿Cómo se midió?",
+            limitsButton: "¿Cuáles son las limitaciones?",
+            sectorsButton: "Agricultura y ciudades",
+            initialAnswer: "Elige una pregunta sugerida o escribe la tuya.",
+            disclaimer: "Las respuestas utilizan los datos disponibles y reglas fijas. No son alertas oficiales ni asesoramiento profesional.",
+            noData: "No hay datos disponibles para esta cuenca.",
+            noMetric: "No disponible",
+            mapError: "El mapa no está disponible actualmente en el servidor local.",
+            answerArea: "El área nueva clasificada es {total} km²: {open} km² de agua abierta nueva y {veg} km² de indicador de vegetación inundada. Representa {percent}% del área válida. Estos valores representan áreas identificadas mediante la clasificación de datos satelitales.",
+            answerMethod: "El estudio utiliza NASA NISAR Level-2 GCOV y compara el evento del 31 de octubre de 2026 con una ventana de referencia seca del 1 de junio al 15 de octubre de 2026. La clasificación utiliza umbrales y requiere validación independiente.",
+            answerLimits: "Los resultados muestran las áreas clasificadas y su proporción respecto al área válida.",
+            answerSectors: "Los resultados espaciales pueden combinarse con datos agrícolas, urbanos y comerciales para desarrollar indicadores sectoriales.",
+            answerSource: "La fuente es NASA NISAR Level-2 GCOV. Los metadatos indican canales HH y HV y Copernicus DEM GLO-30 para variables del terreno. Los enlaces están en la tarjeta de evidencia científica.",
+            answerDefault: "Puedo explicar el área clasificada, el método, las limitaciones y los datos necesarios para estimar la exposición. Prueba una de las preguntas sugeridas."
+        }
+    };
+
+    // currentLang/currentBasin/currentRole are top-level let bindings,
+    // so read them directly rather than assuming they are window properties.
+    function currentLanguage() {
+        try {
+            if (typeof currentLang !== "undefined" && translations[currentLang]) {
+                return currentLang;
+            }
+        } catch (_) {}
+        return "en";
+    }
+
+    function currentBasinId() {
+        try {
+            if (typeof currentBasin !== "undefined" && currentBasin) return currentBasin;
+        } catch (_) {}
+        return "babahoyo";
+    }
+
+    function currentUserRole() {
+        try {
+            if (typeof currentRole !== "undefined" && currentRole) return currentRole;
+        } catch (_) {}
+        return "farmer";
+    }
+
+    function t(key) {
+        const language = currentLanguage();
+        return translations[language][key] || translations.en[key] || key;
+    }
+
+    function put(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    }
+
+    function applyLanguage() {
+        const language = currentLanguage();
+        const rtl = language === "ar";
+        section.dir = rtl ? "rtl" : "ltr";
+        section.lang = language;
+
+        const ids = {
+            "hv-evidence-title": "title",
+            "hv-evidence-subtitle": "subtitle",
+            "hv-evidence-status": "status",
+            "hv-evidence-data-title": "evidence",
+            "hv-label-mission": "mission",
+            "hv-label-product": "product",
+            "hv-label-event": "event",
+            "hv-label-baseline": "baseline",
+            "hv-label-pol": "pol",
+            "hv-label-method": "method",
+            "hv-method-value": "methodValue",
+            "hv-label-terrain": "terrain",
+            "hv-evidence-validation": "validation",
+            "hv-link-nisar": "nisarLink",
+            "hv-link-asf": "asfLink",
+            "hv-threshold-title": "thresholds",
+            "hv-label-water": "water",
+            "hv-label-veg-change": "vegChange",
+            "hv-label-hv": "hv",
+            "hv-label-sampling": "sampling",
+            "hv-threshold-note": "thresholdNote",
+            "hv-change-title": "change",
+            "hv-change-description": "changeDesc",
+            "hv-legend-water": "legendWater",
+            "hv-legend-veg": "legendVeg",
+            "hv-legend-other": "legendOther",
+            "hv-legend-invalid": "legendInvalid",
+            "hv-map-note": "mapNote",
+            "hv-download-classes": "download",
+            "hv-impact-title": "impact",
+            "hv-impact-total-label": "total",
+            "hv-impact-percent-label": "percent",
+            "hv-impact-open-label": "open",
+            "hv-impact-veg-label": "vegetation",
+            "hv-impact-limit": "impactLimit",
+            "hv-earth-title": "ask",
+            "hv-earth-subtitle": "askSub",
+            "hv-earth-ask": "askButton",
+            "hv-earth-disclaimer": "disclaimer"
+        };
+
+        Object.keys(ids).forEach(id => put(id, t(ids[id])));
+
+        const badge = section.querySelector(".hv-evidence-grid")?.parentElement
+            ?.querySelector(".text-xs.font-bold.text-teal-400");
+        if (badge) badge.textContent = t("assistantBadge");
+
+        const input = document.getElementById("hv-earth-question");
+        if (input) input.placeholder = t("placeholder");
+
+        section.querySelectorAll("[data-hv-question]").forEach(button => {
+            const labels = {
+                area: "areaButton",
+                method: "methodButton",
+                limits: "limitsButton",
+                sectors: "sectorsButton"
+            };
+            button.textContent = t(labels[button.dataset.hvQuestion] || "areaButton");
+        });
+
+        const answer = document.getElementById("hv-earth-answer");
+        if (answer && !answer.dataset.answered) answer.textContent = t("initialAnswer");
+
+        renderImpact();
+    }
+
+    function formatNumber(value) {
+        if (value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) {
+            return t("noMetric");
+        }
+
+        const locale = currentLanguage() === "ar"
+            ? "ar-EG"
+            : currentLanguage() === "es" ? "es-ES" : "en-US";
+
+        return Number(value).toLocaleString(locale, { maximumFractionDigits: 2 });
+    }
+
+    function renderImpact() {
+        if (!latest || !latest.metrics) {
+            put("hv-impact-basin", t("noData"));
+            ["hv-impact-total", "hv-impact-percent", "hv-impact-open", "hv-impact-veg", "hv-impact-coverage"]
+                .forEach(id => put(id, "—"));
+            return;
+        }
+
+        const m = latest.metrics;
+        put("hv-impact-basin", latest.basinName || latest.basinId || "—");
+        put("hv-impact-total", formatNumber(m.new_flood_total_km2));
+        put("hv-impact-percent", formatNumber(m.flooded_percent) + (m.flooded_percent == null ? "" : "%"));
+        put("hv-impact-open", formatNumber(m.new_open_water_km2));
+        put("hv-impact-veg", formatNumber(m.flooded_veg_km2));
+        put("hv-impact-coverage", t("coverage") + " " + formatNumber(m.scene_coverage_pct) + (m.scene_coverage_pct == null ? "" : "%"));
+    }
+
+    async function loadEvidence() {
+        try {
+            const response = await fetch("/api/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    basinId: currentBasinId(),
+                    role: currentUserRole(),
+                    lang: currentLanguage() === "es" ? "en" : currentLanguage()
+                })
+            });
+
+            if (!response.ok) throw new Error("Analysis endpoint returned " + response.status);
+
+            latest = await response.json();
+            renderImpact();
+            applyLanguage();
+        } catch (error) {
+            console.error("Evidence panel update failed:", error);
+            put("hv-impact-basin", t("noData"));
+            ["hv-impact-total", "hv-impact-percent", "hv-impact-open", "hv-impact-veg"]
+                .forEach(id => put(id, t("noMetric")));
+        }
+    }
+
+    function answerQuestion(kind) {
+        const answer = document.getElementById("hv-earth-answer");
+        if (!answer) return;
+
+        const m = latest && latest.metrics ? latest.metrics : null;
+        let result = t("answerDefault");
+
+        if (kind === "area") {
+            if (!m) {
+                result = t("noData");
+            } else {
+                result = t("answerArea")
+                    .replace("{total}", formatNumber(m.new_flood_total_km2))
+                    .replace("{open}", formatNumber(m.new_open_water_km2))
+                    .replace("{veg}", formatNumber(m.flooded_veg_km2))
+                    .replace("{percent}", formatNumber(m.flooded_percent));
+            }
+        } else if (kind === "method") {
+            result = t("answerMethod");
+        } else if (kind === "limits") {
+            result = t("answerLimits");
+        } else if (kind === "sectors") {
+            result = t("answerSectors");
+        } else if (kind === "source") {
+            result = t("answerSource");
+        }
+
+        answer.textContent = result;
+        answer.dataset.answered = "true";
+    }
+
+    function askTypedQuestion() {
+        const input = document.getElementById("hv-earth-question");
+        const question = (input && input.value || "").toLowerCase().trim();
+
+        if (!question) {
+            answerQuestion("default");
+            return;
+        }
+
+        const contains = words => words.some(word => question.includes(word));
+
+        if (contains(["area", "km", "مساحة", "المساح", "área", "superficie"])) {
+            answerQuestion("area");
+        } else if (contains(["vegetation", "crop", "plant", "نبات", "محصول", "زراع", "vegetación", "cultivo"])) {
+            answerQuestion("sectors");
+        } else if (contains(["farm", "agric", "urban", "city", "building", "commercial", "زراعة", "مزارع", "مدن", "مباني", "تجارة", "agricultura", "ciudad", "edificio"])) {
+            answerQuestion("sectors");
+        } else if (contains(["why", "limit", "reliable", "valid", "confirmed", "official", "موثوق", "مؤكد", "حدود", "دقيق", "رسمي", "por qué", "fiable", "límite"])) {
+            answerQuestion("limits");
+        } else if (contains(["source", "satellite", "nisar", "data", "مصدر", "قمر", "بيانات", "fuente", "satélite", "datos"])) {
+            answerQuestion("source");
+        } else if (contains(["how", "method", "threshold", "measure", "منهج", "طريقة", "عتبة", "قياس", "cómo", "método", "umbral"])) {
+            answerQuestion("method");
+        } else {
+            answerQuestion("default");
+        }
+    }
+
+    const askButton = document.getElementById("hv-earth-ask");
+    if (askButton) askButton.addEventListener("click", askTypedQuestion);
+
+    const input = document.getElementById("hv-earth-question");
+    if (input) {
+        input.addEventListener("keydown", event => {
+            if (event.key === "Enter") askTypedQuestion();
+        });
+    }
+
+    section.querySelectorAll("[data-hv-question]").forEach(button => {
+        button.addEventListener("click", () => {
+            const input = document.getElementById("hv-earth-question");
+            const askButton = document.getElementById("hv-earth-ask");
+            if (!input || !askButton) return;
+
+            const prompts = {
+                area: {
+                    ar: "ما مساحة الفيضان والمياه الجديدة في الحوض الحالي؟",
+                    en: "What is the classified flood area and new water area in the selected basin?",
+                    es: "¿Cuál es el área inundada clasificada y el área de agua nueva en la cuenca seleccionada?"
+                },
+                method: {
+                    ar: "كيف استخدم المشروع بيانات الأقمار الصناعية لحساب النتائج؟",
+                    en: "How does the project use satellite data to calculate its results?",
+                    es: "¿Cómo utiliza el proyecto los datos satelitales para calcular los resultados?"
+                },
+                limits: {
+                    ar: "ما مدى دقة النتائج وما حدود البيانات؟",
+                    en: "How reliable are these results and what are the data limitations?",
+                    es: "¿Qué tan fiables son los resultados y cuáles son las limitaciones?"
+                },
+                sectors: {
+                    ar: "كيف يمكن أن يؤثر الفيضان على الزراعة والصيد والتجارة والنقل؟",
+                    en: "How could flooding affect agriculture, fishing, trade and transportation?",
+                    es: "¿Cómo podrían afectar las inundaciones a la agricultura, la pesca, el comercio y el transporte?"
+                }
+            };
+
+            const kind = button.dataset.hvQuestion;
+            const language = typeof currentLang !== "undefined" ? currentLang : "en";
+            input.value = prompts[kind] && prompts[kind][language]
+                ? prompts[kind][language]
+                : prompts[kind] ? prompts[kind].en : button.textContent.trim();
+
+            askButton.click();
+        });
+    });
+
+    const mapImage = document.getElementById("hv-classification-map");
+    if (mapImage) {
+        mapImage.addEventListener("error", () => {
+            mapImage.style.display = "none";
+            put("hv-map-note", t("mapNote") + " " + t("mapError"));
+        });
+    }
+
+    // Keep the original dashboard actions, then refresh this panel.
+    if (typeof window.setBasin === "function" && !window.setBasin.__hvI18nWrapped) {
+        const original = window.setBasin;
+        const wrapped = function () {
+            const result = original.apply(this, arguments);
+            loadEvidence();
+            return result;
+        };
+        wrapped.__hvI18nWrapped = true;
+        window.setBasin = wrapped;
+    }
+
+    if (typeof window.toggleLanguage === "function" && !window.toggleLanguage.__hvI18nWrapped) {
+        const original = window.toggleLanguage;
+        const wrapped = function () {
+            const result = original.apply(this, arguments);
+            applyLanguage();
+            loadEvidence();
+            return result;
+        };
+        wrapped.__hvI18nWrapped = true;
+        window.toggleLanguage = wrapped;
+    }
+
+    applyLanguage();
+    loadEvidence();
+})();
+</script>
+
+<script id="hv-professional-sidebar-script">
+(function () {
+    const sidebar = document.getElementById('hv-sidebar');
+    if (!sidebar) return;
+
+    const links = Array.from(sidebar.querySelectorAll('.hv-side-link'));
+
+    function setActive(target) {
+        links.forEach(link => {
+            link.classList.toggle('active', link.dataset.hvTarget === target);
+        });
+    }
+
+    function refreshSidebarLanguage() {
+        let lang = 'ar';
+        try {
+            if (typeof currentLang !== 'undefined') lang = currentLang;
+        } catch (e) {}
+
+        const key = lang === 'es' ? 'es' : (lang === 'en' ? 'en' : 'ar');
+
+        sidebar.querySelectorAll('[data-hv-ar]').forEach(el => {
+            el.textContent = el.getAttribute('data-hv-' + key) || el.getAttribute('data-hv-ar');
+        });
+
+        const caption = sidebar.querySelector('[data-hv-nav-caption]');
+        if (caption) {
+            caption.textContent = key === 'ar' ? 'مساحة العمل' :
+                (key === 'es' ? 'ESPACIO DE TRABAJO' : 'WORKSPACE');
+        }
+    }
+
+    links.forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const targetId = link.dataset.hvTarget;
+            const isGov = link.dataset.hvView === 'gov';
+
+            if (isGov && typeof window.switchMainView === 'function') {
+                window.switchMainView('gov');
+            } else if (targetId !== 'view-public' &&
+                       document.getElementById('view-gov') &&
+                       !document.getElementById('view-gov').classList.contains('hidden') &&
+                       typeof window.switchMainView === 'function') {
+                window.switchMainView('public');
+            }
+
+            setActive(targetId);
+
+            window.setTimeout(() => {
+                const target = document.getElementById(targetId);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        });
+    });
+
+    const observedIds = [
+        'view-public',
+        'basin-babahoyo',
+        'basin-map',
+        'hv-evidence-section',
+        'hv-earth-answer',
+        'view-gov'
+    ];
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            const visible = entries
+                .filter(entry => entry.isIntersecting)
+                .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+            if (visible.length) setActive(visible[0].target.id);
+        }, { rootMargin: '-105px 0px -60% 0px', threshold: [0, 0.15, 0.35] });
+
+        observedIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+    }
+
+    refreshSidebarLanguage();
+
+    if (typeof window.toggleLanguage === 'function') {
+        const originalToggleLanguage = window.toggleLanguage;
+        window.toggleLanguage = function () {
+            const result = originalToggleLanguage.apply(this, arguments);
+            refreshSidebarLanguage();
+            return result;
+        };
+    }
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('#tab-public')) {
+            setActive('view-public');
+        }
+        if (event.target.closest('#tab-gov')) {
+            setActive('view-gov');
+        }
+    });
+
+    window.addEventListener('load', refreshSidebarLanguage);
+})();
+</script>
+
+
+<script id="hv-assistant-voice-script">
+(function () {
+    "use strict";
+
+    const input = document.getElementById("hv-earth-question");
+    const askButton = document.getElementById("hv-earth-ask");
+    const micButton = document.getElementById("hv-earth-mic");
+    const speakButton = document.getElementById("hv-earth-speak");
+    const answerBox = document.getElementById("hv-earth-answer");
+
+    if (!input || !askButton || !answerBox) return;
+
+    let recognition = null;
+    let busy = false;
+
+    function getLanguage() {
+        try {
+            if (typeof currentLang !== "undefined" && ["ar", "en", "es"].includes(currentLang)) {
+                return currentLang;
+            }
+        } catch (_) {}
+        return document.documentElement.lang === "ar" ? "ar" :
+            document.documentElement.lang === "es" ? "es" : "en";
+    }
+
+    function getBasin() {
+        try {
+            if (typeof currentBasin !== "undefined" && currentBasin) return currentBasin;
+        } catch (_) {}
+        return "babahoyo";
+    }
+
+    function getRole() {
+        try {
+            if (typeof currentRole !== "undefined" && currentRole) return currentRole;
+        } catch (_) {}
+        return "farmer";
+    }
+
+    function setStatus(message) {
+        answerBox.textContent = message;
+        answerBox.dataset.answered = "true";
+    }
+
+    async function askAssistant() {
+        const question = input.value.trim();
+        if (!question || busy) return;
+
+        busy = true;
+        askButton.disabled = true;
+        askButton.textContent = getLanguage() === "ar" ? "جاري التفكير..." :
+            getLanguage() === "es" ? "Consultando..." : "Thinking...";
+
+        try {
+            const response = await fetch("/api/assistant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    question,
+                    basinId: getBasin(),
+                    role: getRole(),
+                    lang: getLanguage()
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Request failed");
+
+            answerBox.textContent = data.answer || "No answer available.";
+            answerBox.dataset.answered = "true";
+            answerBox.dataset.language = data.language || getLanguage();
+        } catch (error) {
+            console.error("HydroVision assistant:", error);
+            setStatus(getLanguage() === "ar"
+                ? "تعذر الاتصال بالمساعد. تأكدي أن الخادم يعمل ثم حاولي مرة أخرى."
+                : getLanguage() === "es"
+                    ? "No se pudo conectar con el asistente. Comprueba que el servidor esté activo."
+                    : "Could not connect to the assistant. Check that the server is running.");
+        } finally {
+            busy = false;
+            askButton.disabled = false;
+            askButton.textContent = getLanguage() === "ar" ? "اسأل" :
+                getLanguage() === "es" ? "Preguntar" : "Ask";
+        }
+    }
+
+    askButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        askAssistant();
+    }, true);
+
+    input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            askAssistant();
+        }
+    }, true);
+
+    if (micButton) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            micButton.disabled = true;
+            micButton.title = "Speech recognition is not supported by this browser.";
+        } else {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            micButton.addEventListener("click", function () {
+                recognition.lang = getLanguage() === "ar" ? "ar-EG" :
+                    getLanguage() === "es" ? "es-ES" : "en-US";
+
+                try {
+                    recognition.start();
+                    micButton.textContent = "🎙️ Listening...";
+                } catch (error) {
+                    console.warn("Microphone:", error);
+                }
+            });
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                input.value = transcript;
+                askAssistant();
+            };
+
+            recognition.onerror = function (event) {
+                console.warn("Speech recognition error:", event.error);
+                micButton.textContent = "🎤 Voice";
+            };
+
+            recognition.onend = function () {
+                micButton.textContent = getLanguage() === "ar" ? "🎤 تحدثي" :
+                    getLanguage() === "es" ? "🎤 Hablar" : "🎤 Voice";
+            };
+        }
+    }
+
+    if (speakButton) {
+        speakButton.addEventListener("click", function () {
+            if (!("speechSynthesis" in window)) {
+                setStatus(getLanguage() === "ar"
+                    ? "ميزة القراءة الصوتية غير مدعومة في هذا المتصفح."
+                    : getLanguage() === "es"
+                        ? "La lectura de voz no es compatible con este navegador."
+                        : "Text-to-speech is not supported by this browser.");
+                return;
+            }
+
+            const text = answerBox.textContent.trim();
+            if (!text) return;
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = getLanguage() === "ar" ? "ar-EG" :
+                getLanguage() === "es" ? "es-ES" : "en-US";
+            utterance.rate = 0.95;
+            window.speechSynthesis.speak(utterance);
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,58 @@
+{
+  "babahoyo": {
+    "name_ar": "حوض نهر باباهويو (Babahoyo)",
+    "name_en": "Babahoyo Basin",
+    "metrics": {
+      "flow_rate_m3s": 1450,
+      "flow_status_ar": "مرتفع جداً",
+      "flow_status_en": "Very High",
+      "slope_deg": 34,
+      "slope_status_ar": "انحدار حاد",
+      "slope_status_en": "Steep Slope",
+      "flood_risk_percent": 85
+    },
+    "colab_summary": "High discharge from Andean highlands, steep slope causing rapid runoff and sediment carving."
+  },
+  "lower_guayas": {
+    "name_ar": "حوض نهر غواياس السفلي (Lower Guayas)",
+    "name_en": "Lower Guayas Basin",
+    "metrics": {
+      "flow_rate_m3s": 2100,
+      "flow_status_ar": "مرتفع ومستقر",
+      "flow_status_en": "High & Stable",
+      "slope_deg": 6,
+      "slope_status_ar": "منبسط وساحلي",
+      "slope_status_en": "Flat & Coastal",
+      "flood_risk_percent": 65
+    },
+    "colab_summary": "Main estuary collecting discharge from Daule and Babahoyo, affected by Pacific tidal backwater."
+  },
+  "daule": {
+    "name_ar": "حوض نهر داولي (Daule)",
+    "name_en": "Daule Basin",
+    "metrics": {
+      "flow_rate_m3s": 780,
+      "flow_status_ar": "متوسط ومنتظم",
+      "flow_status_en": "Moderate & Regulated",
+      "slope_deg": 15,
+      "slope_status_ar": "متوسط الانحدار",
+      "slope_status_en": "Moderate Slope",
+      "flood_risk_percent": 40
+    },
+    "colab_summary": "Regulated by Daule-Peripa dam, moderate slope, controlled agricultural irrigation supply."
+  },
+  "vinces": {
+    "name_ar": "حوض نهر فينسيس (Vinces)",
+    "name_en": "Vinces Basin",
+    "metrics": {
+      "flow_rate_m3s": 620,
+      "flow_status_ar": "متذبذب وموسمي",
+      "flow_status_en": "Fluctuating & Seasonal",
+      "slope_deg": 11,
+      "slope_status_ar": "تدريجي خفيف",
+      "slope_status_en": "Gentle Slope",
+      "flood_risk_percent": 50
+    },
+    "colab_summary": "Strong seasonal variation between wet and dry seasons, prone to localized overflow in low-lying farms."
+  }
+}

@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroVision | NASA NISAR River Basins Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .active-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+    </style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+#basin-map .river-flow-line {
+ stroke-dasharray:9 8;
+ animation:hydroRiverFlow 1.7s linear infinite;
+}
+@keyframes hydroRiverFlow { to { stroke-dashoffset:-34; } }
+</style>
+
+
+<!-- HYDROVISION_PRO_UI_V1 -->
+<style>
+:root {
+  color-scheme: dark;
+  --hv-cyan: #22d3ee;
+  --hv-blue: #38bdf8;
+  --hv-border: rgba(148, 163, 184, .16);
+  --hv-surface: rgba(15, 23, 42, .72);
+}
+
+/* Smooth, consistent interface */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #155e75 #0b1220;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(34, 211, 238, .25);
+  color: #ecfeff;
+}
+
+/* Premium cards */
+.glass-card {
+  border: 1px solid var(--hv-border);
+  box-shadow:
+    0 10px 35px rgba(2, 8, 23, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .025);
+  transition:
+    border-color .22s ease,
+    box-shadow .22s ease,
+    transform .22s ease,
+    background-color .22s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(34, 211, 238, .28);
+  box-shadow:
+    0 16px 42px rgba(2, 8, 23, .25),
+    0 0 22px rgba(34, 211, 238, .045);
+}
+
+/* Buttons and interactive controls */
+button,
+.role-btn,
+.basin-btn {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--hv-cyan);
+  outline-offset: 3px;
+}
+
+button:not(:disabled):active {
+  transform: scale(.98);
+}
+
+.active-btn {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, .24),
+              0 0 18px rgba(34, 211, 238, .09);
+}
+
+/* Dashboard headings */
+h1, h2, h3 {
+  text-wrap: balance;
+  letter-spacing: -.015em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Map presentation */
+#basin-map {
+  overflow: hidden;
+  border: 1px solid var(--hv-border);
+  border-radius: 16px;
+  background: #0f172a;
+  box-shadow: 0 12px 32px rgba(2, 8, 23, .22);
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-control-zoom a {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, .22) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #164e63 !important;
+  color: white !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #164e63;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0891b2;
+}
+
+/* Responsive refinements */
+@media (max-width: 768px) {
+  #basin-map {
+    border-radius: 12px;
+  }
+
+  .glass-card {
+    border-radius: 14px;
+  }
+
+  button {
+    min-height: 40px;
+  }
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+<!-- /HYDROVISION_PRO_UI_V1 -->
+
+
+<!-- HYDROVISION_VISUAL_REFRESH_V2 -->
+<style>
+/* ===== HYDROVISION: VISUAL REFRESH ===== */
+
+:root {
+  --hv-bg: #071321;
+  --hv-panel: #101f32;
+  --hv-panel-2: #142940;
+  --hv-line: rgba(148, 190, 211, .16);
+  --hv-cyan: #36d9ed;
+  --hv-blue: #398bfa;
+  --hv-text: #edf7ff;
+  --hv-muted: #9bb0c5;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--hv-bg);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 8% 8%, rgba(8, 145, 178, .16), transparent 34%),
+    radial-gradient(ellipse at 92% 35%, rgba(37, 99, 235, .12), transparent 32%),
+    linear-gradient(145deg, #071321 0%, #0b192a 48%, #081522 100%) !important;
+  color: var(--hv-text);
+  min-height: 100vh;
+}
+
+/* Header */
+body > nav {
+  background: rgba(7, 19, 33, .91) !important;
+  border-bottom: 1px solid rgba(54, 217, 237, .2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .2);
+}
+
+body > nav > div {
+  min-height: 76px;
+  height: auto !important;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+body > nav button {
+  border-radius: 11px !important;
+  font-weight: 700;
+}
+
+body > nav button:hover {
+  border-color: rgba(54, 217, 237, .5) !important;
+  background-color: rgba(14, 116, 144, .2) !important;
+}
+
+/* Main page spacing */
+main {
+  position: relative;
+}
+
+#view-public,
+#view-gov {
+  scroll-margin-top: 95px;
+}
+
+/* All dashboard panels */
+.glass-card {
+  background:
+    linear-gradient(145deg, rgba(20, 41, 64, .96), rgba(12, 29, 47, .96)) !important;
+  border: 1px solid var(--hv-line) !important;
+  border-radius: 21px !important;
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, .19),
+    inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(54, 217, 237, .32) !important;
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, .25),
+    0 0 24px rgba(34, 211, 238, .055) !important;
+}
+
+/* Hero section */
+#view-public > .glass-card:first-child {
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+  background:
+    radial-gradient(ellipse at 90% 15%, rgba(34, 211, 238, .16), transparent 42%),
+    linear-gradient(120deg, #10283e 0%, #12334b 52%, #10243c 100%) !important;
+  border-color: rgba(54, 217, 237, .25) !important;
+  padding: 34px !important;
+}
+
+#view-public > .glass-card:first-child h1 {
+  font-size: clamp(1.7rem, 3vw, 2.65rem) !important;
+  line-height: 1.45;
+  font-weight: 800;
+  color: #f4fbff;
+}
+
+#view-public > .glass-card:first-child p {
+  max-width: 760px;
+  line-height: 2;
+  color: #b6c9da !important;
+}
+
+/* Section headings */
+.glass-card h2,
+.glass-card h3 {
+  color: #edf8ff;
+  font-weight: 800;
+}
+
+.glass-card h2 {
+  letter-spacing: -.3px;
+}
+
+/* Role and basin selection */
+.role-btn,
+.basin-btn {
+  border-radius: 14px !important;
+  min-height: 66px;
+  border-color: rgba(148, 190, 211, .19) !important;
+  background: rgba(7, 19, 33, .48) !important;
+}
+
+.role-btn:hover,
+.basin-btn:hover {
+  background: rgba(8, 145, 178, .14) !important;
+  border-color: rgba(54, 217, 237, .55) !important;
+  transform: translateY(-2px);
+}
+
+.active-btn {
+  background: linear-gradient(130deg, #087e9b, #1556a6) !important;
+  border-color: #36d9ed !important;
+  color: white !important;
+  box-shadow: 0 7px 24px rgba(14, 165, 233, .19) !important;
+}
+
+/* Map panel */
+.glass-card:has(#basin-map) {
+  overflow: hidden;
+}
+
+#basin-map {
+  height: 430px !important;
+  min-height: 350px !important;
+  border: 1px solid rgba(54, 217, 237, .24) !important;
+  border-radius: 17px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .24);
+}
+
+.leaflet-container {
+  font-family: 'Cairo', sans-serif !important;
+}
+
+.leaflet-control-zoom a {
+  background: #10263b !important;
+  color: #e8f8ff !important;
+  border-color: #29465e !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #087e9b !important;
+}
+
+/* NASA metrics panel */
+.glass-card:has(#metric-flow) {
+  background:
+    linear-gradient(155deg, rgba(16, 42, 62, .98), rgba(10, 27, 44, .98)) !important;
+  border-top: 3px solid var(--hv-cyan) !important;
+}
+
+.glass-card:has(#metric-flow) .grid > div {
+  background: rgba(5, 19, 33, .65) !important;
+  border: 1px solid rgba(148, 190, 211, .15) !important;
+  border-radius: 14px !important;
+  padding: 15px 10px !important;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.glass-card:has(#metric-flow) .grid > div:hover {
+  background: rgba(8, 58, 79, .45) !important;
+  border-color: rgba(54, 217, 237, .38) !important;
+}
+
+[id^="metric-"] {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.4px;
+}
+
+/* Recommendation and government panels */
+#view-public .glass-card:has(#recommendations-list),
+#view-gov .glass-card {
+  border-color: rgba(148, 190, 211, .17) !important;
+}
+
+#view-gov .glass-card {
+  background:
+    linear-gradient(145deg, rgba(24, 39, 58, .97), rgba(13, 29, 46, .97)) !important;
+}
+
+#view-gov .glass-card:hover {
+  border-color: rgba(251, 191, 36, .3) !important;
+}
+
+/* Buttons throughout the application */
+button {
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease !important;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--hv-cyan) !important;
+  outline-offset: 3px;
+}
+
+button:not(:disabled):active {
+  transform: scale(.98);
+}
+
+/* Text hierarchy */
+.text-slate-400 {
+  color: #a5b8ca !important;
+}
+
+.text-slate-300 {
+  color: #c4d5e4 !important;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  body > nav > div {
+    min-height: 68px;
+  }
+
+  #view-public > .glass-card:first-child {
+    padding: 23px !important;
+    min-height: auto;
+  }
+
+  #basin-map {
+    height: 350px !important;
+    min-height: 300px !important;
+  }
+
+  .glass-card {
+    border-radius: 16px !important;
+  }
+
+  .role-btn,
+  .basin-btn {
+    min-height: 58px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+<!-- /HYDROVISION_VISUAL_REFRESH_V2 -->
+
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-xl shadow-lg">
+                    🌊
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-wide text-white">HydroVision AI</span>
+                    <span class="block text-xs text-cyan-400" data-i18n="nav-sub">تحليل بيانات ناسا لأحواض الأنهار</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-cyan-400 hover:bg-slate-700 transition flex items-center gap-1.5">
+                    <span>🌐</span> <span id="lang-label">English</span>
+                </button>
+
+                <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button onclick="switchMainView('public')" id="tab-public" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition active-btn text-white" data-i18n="tab-public">
+                        بوابة المجتمع
+                    </button>
+                    <button onclick="switchMainView('gov')" id="tab-gov" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition text-slate-300 hover:text-white" data-i18n="tab-gov">
+                        بوابة الدولة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- VIEW 1: PUBLIC / USERS -->
+        <div id="view-public" class="space-y-8">
+            
+            <div class="glass-card rounded-2xl p-6 md:p-8 shadow-xl">
+                <div class="max-w-3xl">
+                    <span class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-3 border border-cyan-500/20" data-i18n="badge-top">
+                        تحليل قائم على بيانات الأقمار الصناعية NASA NISAR
+                    </span>
+                    <h1 class="text-2xl md:text-4xl font-extrabold text-white mb-3" data-i18n="main-title">
+                        افهم حركة النهر، وتجنب مخاطر الفيضانات في منطقتك
+                    </h1>
+                    <p class="text-slate-400 text-sm md:text-base mb-6" data-i18n="main-desc">
+                        اختر صفتك وحوض النهر القريب منك للحصول على شرح مبسط للظاهرة وتوصيات مخصصة لحالتك بناءً على البيانات الحية.
+                    </p>
+                </div>
+
+                <!-- Filters Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-700/60">
+                    <!-- Role Selection -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-3" data-i18n="label-role">1. حدد فئتك (من أنت؟):</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setRole('farmer')" id="role-farmer" class="role-btn active-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1">
+                                <span class="text-2xl">🌾</span>
+                                <span class="text-sm font-bold" data-i18n="role-farmer">مزارع</span>
+                            </button>
+                            <button onclick="setRole('tourist')" id="role-tourist" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1 hover:border-slate-500">
+                                <span class="text-2xl">🎒</span>
+                                <span class="text-sm font-bold" data-i18n="role-tourist">سائح / زائر</span>
+                            </button>
+                            <button onclick="setRole('resident')" id="role-resident" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-center transition flex flex-col items-center gap-1 hover:border-slate-500">
+                                <span class="text-2xl">🏠</span>
+                                <span class="text-sm font-bold" data-i18n="role-resident">ساكن محلي</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Basin Selection -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-3" data-i18n="label-basin">2. اختر حوض النهر القريب منك:</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="setBasin('babahoyo')" id="basin-babahoyo" class="basin-btn active-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-babahoyo-title">حوض باباهويو</div>
+                                    <div class="text-xs text-cyan-200">Babahoyo Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                            </button>
+                            <button onclick="setBasin('lower_guayas')" id="basin-lower_guayas" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-guayas-title">غواياس السفلي</div>
+                                    <div class="text-xs text-slate-400">Lower Guayas</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            </button>
+                            <button onclick="setBasin('daule')" id="basin-daule" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-daule-title">حوض داولي</div>
+                                    <div class="text-xs text-slate-400">Daule Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            </button>
+                            <button onclick="setBasin('vinces')" id="basin-vinces" class="basin-btn p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-right transition flex items-center justify-between hover:border-slate-500">
+                                <div>
+                                    <div class="text-sm font-bold" data-i18n="basin-vinces-title">حوض فينسيس</div>
+                                    <div class="text-xs text-slate-400">Vinces Basin</div>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Storytelling & Topography Explanation -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <span>🎬</span> <span data-i18n="story-heading">قصة الحوض وطبيعة التضاريس</span>
+                            </h2>
+                            <span id="basin-badge" class="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-bold">
+                                حوض باباهويو (Babahoyo)
+                            </span>
+                        </div>
+                        
+                        <div class="relative rounded-xl overflow-hidden bg-slate-900 border border-slate-700 aspect-video flex flex-col items-center justify-center p-6 text-center">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                            
+<div id="basin-map" role="region" aria-label="Interactive geographic river map"
+ style="width:100%;height:390px;min-height:320px;border-radius:16px;overflow:hidden;background:#e2e8f0;">
+ <div style="padding:20px;color:#334155;">Loading geographic river map...</div>
+</div>
+
+                            <div class="relative z-10">
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                        <h3 class="text-sm font-bold text-cyan-400 mb-1" data-i18n="why-flood">لماذا يحدث الفيضان هنا؟ (التفسير العلمي المبسط)</h3>
+                        <p id="story-text" class="text-sm text-slate-300 leading-relaxed">...</p>
+                    </div>
+                </div>
+
+                <!-- Live NASA Data & AI Recommendations -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col justify-between border-t-4 border-t-cyan-500">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <span>🤖</span> <span data-i18n="ai-recs">توصيات الذكاء الاصطناعي لك</span>
+                            </h2>
+                            <span id="api-status-badge" class="text-xs text-emerald-400 flex items-center gap-1 font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> <span data-i18n="live-data">متصل بالخادم</span>
+                            </span>
+                        </div>
+
+                        <!-- Live Metrics -->
+                        <div class="grid grid-cols-3 gap-2 mb-5">
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-1">معدل التدفق</div>
+                                <div id="metric-flow" class="text-base font-extrabold text-red-400 mt-1">--</div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-2">درجة الانحدار</div>
+                                <div id="metric-slope" class="text-base font-extrabold text-amber-400 mt-1">--</div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl text-center border border-slate-700">
+                                <div class="text-xs text-slate-400" data-i18n="metric-3">احتمال الفيضان</div>
+                                <div id="metric-risk" class="text-base font-extrabold text-red-400 mt-1">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Actionable Steps -->
+                        <div class="space-y-3">
+                            <div class="text-sm font-bold text-slate-200" id="rec-title">...</div>
+                            <ul id="rec-list" class="space-y-2.5 text-sm text-slate-300">
+                                <li class="p-3 rounded-xl bg-slate-800/70 animate-pulse">جاري التحليل...</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+                        <span data-i18n="datasource">المصدر: NASA NISAR GCOV</span>
+                        <span class="text-cyan-400 font-semibold" id="source-mode">API Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: GOVERNMENT / DECISION MAKERS -->
+        <div id="view-gov" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 md:p-8 border-r-4 border-r-amber-500">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20" data-i18n="gov-badge">
+                            تحليل استراتيجي طويل المدى (Long-Term Planning)
+                        </span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-white mt-2" data-i18n="gov-title">
+                            توصيات إدارة الموارد المائية والحد من مخاطر الكوارث
+                        </h1>
+                        <p class="text-slate-400 text-sm mt-1" data-i18n="gov-desc">
+                            حلول هندسية وبيئية مقترحة بناءً على تحليل دورات الفيضان والجفاف عبر المواسم المختلفة.
+                        </p>
+                    </div>
+                    <div class="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 self-start">
+                        <button onclick="setSeason('flood')" id="season-flood" class="px-4 py-2 rounded-lg text-xs font-bold active-btn text-white transition" data-i18n="season-1">
+                            🌧️ موسم الفيضان (Season 1)
+                        </button>
+                        <button onclick="setSeason('drought')" id="season-drought" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition" data-i18n="season-2">
+                            ☀️ موسم الجفاف (Season 2)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gov-cards" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500" data-i18n="footer">
+        HydroVision • NASA NISAR GCOV Data Platform
+    </footer>
+
+    <script>
+        let currentLang = 'ar';
+        let currentRole = 'farmer';
+        let currentBasin = 'babahoyo';
+        let currentSeason = 'flood';
+
+        const i18n = {
+            ar: {
+                'nav-sub': 'تحليل بيانات ناسا لأحواض الأنهار',
+                'tab-public': 'بوابة المجتمع',
+                'tab-gov': 'بوابة الدولة',
+                'badge-top': 'تحليل قائم على بيانات الأقمار الصناعية NASA NISAR',
+                'main-title': 'افهم حركة النهر، وتجنب مخاطر الفيضانات في منطقتك',
+                'main-desc': 'اختر صفتك وحوض النهر القريب منك للحصول على شرح مبسط للظاهرة وتوصيات مخصصة لحالتك بناءً على البيانات الحية.',
+                'label-role': '1. حدد فئتك (من أنت؟):',
+                'role-farmer': 'مزارع',
+                'role-tourist': 'سائح / زائر',
+                'role-resident': 'ساكن محلي',
+                'label-basin': '2. اختر حوض النهر القريب منك:',
+                'basin-babahoyo-title': 'حوض باباهويو',
+                'basin-guayas-title': 'غواياس السفلي',
+                'basin-daule-title': 'حوض داولي',
+                'basin-vinces-title': 'حوض فينسيس',
+                'story-heading': 'قصة الحوض وطبيعة التضاريس',
+                'play-video': 'تشغيل الشرح المرئي للحوض',
+                'why-flood': 'لماذا يحدث الفيضان هنا؟ (التفسير العلمي المبسط)',
+                'ai-recs': 'توصيات الذكاء الاصطناعي لك',
+                'live-data': 'متصل بالخادم',
+                'metric-1': 'مساحة المياه المفتوحة الجديدة (كم²)',
+                'metric-2': 'متوسط الانحدار (درجة)',
+                'metric-3': 'المساحة المصنفة من المشهد الصالح (%)',
+                'datasource': 'المصدر: NASA NISAR GCOV',
+                'gov-badge': 'تحليل استراتيجي طويل المدى (Long-Term Planning)',
+                'gov-title': 'توصيات إدارة الموارد المائية والحد من مخاطر الكوارث',
+                'gov-desc': 'حلول هندسية وبيئية مقترحة بناءً على تحليل دورات الفيضان والجفاف عبر المواسم المختلفة.',
+                'season-1': '🌧️ موسم الفيضان (Season 1)',
+                'season-2': '☀️ موسم الجفاف (Season 2)',
+                'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
+            },
+            en: {
+                'nav-sub': 'NASA River Basins Data Analysis',
+                'tab-public': 'Public Portal',
+                'tab-gov': 'Government Portal',
+                'badge-top': 'Analysis Based on NASA NISAR Satellite Data',
+                'main-title': 'Understand River Flow & Avoid Flood Risks in Your Area',
+                'main-desc': 'Select your role and nearby river basin to get simple explanations and customized actionable recommendations based on live data.',
+                'label-role': '1. Select Your Role:',
+                'role-farmer': 'Farmer',
+                'role-tourist': 'Tourist',
+                'role-resident': 'Local Resident',
+                'label-basin': '2. Select River Basin:',
+                'basin-babahoyo-title': 'Babahoyo Basin',
+                'basin-guayas-title': 'Lower Guayas',
+                'basin-daule-title': 'Daule Basin',
+                'basin-vinces-title': 'Vinces Basin',
+                'story-heading': 'Basin Story & Topography',
+                'play-video': 'Play AI Visual Story',
+                'why-flood': 'Why do floods happen here? (Simple Scientific Explanation)',
+                'ai-recs': 'AI Recommendations For You',
+                'live-data': 'Server Connected',
+                'metric-1': 'New Open Water Area (km²)',
+                'metric-2': 'Mean Slope (degrees)',
+                'metric-3': 'Classified Area of Valid Scene (%)',
+                'datasource': 'Source: NASA NISAR GCOV',
+                'gov-badge': 'Strategic Long-Term Planning',
+                'gov-title': 'Water Resources & Disaster Risk Reduction Recommendations',
+                'gov-desc': 'Proposed engineering and environmental solutions based on flood and drought cycle analysis across seasons.',
+                'season-1': '🌧️ Flood Season (Season 1)',
+                'season-2': '☀️ Drought Season (Season 2)',
+                'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const root = document.getElementById('html-root');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('lang-label').textContent = currentLang === 'ar' ? 'English' : 'عربي';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+            });
+
+            fetchAnalysis();
+            if(!document.getElementById('view-gov').classList.contains('hidden')) fetchGov();
+        }
+
+        function switchMainView(view) {
+            document.getElementById('view-public').classList.toggle('hidden', view !== 'public');
+            document.getElementById('view-gov').classList.toggle('hidden', view !== 'gov');
+            
+            document.getElementById('tab-public').classList.toggle('active-btn', view === 'public');
+            document.getElementById('tab-public').classList.toggle('text-slate-300', view !== 'public');
+            document.getElementById('tab-gov').classList.toggle('active-btn', view === 'gov');
+            document.getElementById('tab-gov').classList.toggle('text-slate-300', view !== 'gov');
+
+            if(view === 'gov') fetchGov();
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active-btn'));
+            document.getElementById('role-' + role).classList.add('active-btn');
+            fetchAnalysis();
+        }
+
+        function setBasin(basin) {
+            currentBasin = basin;
+            document.querySelectorAll('.basin-btn').forEach(btn => btn.classList.remove('active-btn'));
+            document.getElementById('basin-' + basin).classList.add('active-btn');
+            fetchAnalysis();
+        }
+
+        function setSeason(season) {
+            currentSeason = season;
+            document.getElementById('season-flood').classList.toggle('active-btn', season === 'flood');
+            document.getElementById('season-flood').classList.toggle('text-slate-300', season !== 'flood');
+            document.getElementById('season-drought').classList.toggle('active-btn', season === 'drought');
+            document.getElementById('season-drought').classList.toggle('text-slate-300', season !== 'drought');
+            fetchGov();
+        }
+
+        async function fetchAnalysis() {
+            const listEl = document.getElementById('rec-list');
+            listEl.innerHTML = `<li class="p-3 rounded-xl bg-slate-800/70 text-cyan-400 animate-pulse">${currentLang === 'ar' ? 'جاري تحليل بيانات الحوض...' : 'Analyzing basin data...'}</li>`;
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ basinId: currentBasin, role: currentRole, lang: currentLang })
+                });
+                const data = await res.json();
+
+                document.getElementById('basin-badge').textContent = data.basinName;
+                document.getElementById('story-text').textContent = data.story;
+                document.getElementById('source-mode').textContent = data.dataAvailable ? 'NASA NISAR GCOV' : (currentLang === 'ar' ? 'بانتظار ملف نتائج NASA' : 'Waiting for NASA results');
+
+                document.getElementById('metric-flow').textContent = data.metrics.new_open_water_km2 === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.new_open_water_km2 + ' km²';
+                document.getElementById('metric-slope').textContent = data.metrics.mean_slope_deg === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.mean_slope_deg + '°';
+                document.getElementById('metric-risk').textContent = data.metrics.flooded_percent === null ? (currentLang === 'ar' ? 'غير متاح' : 'N/A') : data.metrics.flooded_percent + '%';
+
+                const roleNames = {
+                    ar: { farmer: 'للمزارعين', tourist: 'للسياح والزوار', resident: 'للسكان المحليين' },
+                    en: { farmer: 'for Farmers', tourist: 'for Tourists', resident: 'for Residents' }
+                };
+                document.getElementById('rec-title').textContent = currentLang === 'ar'
+                    ? `إرشادات عامة ${roleNames.ar[currentRole]} في ${data.basinName}:`
+                    : `General guidance ${roleNames.en[currentRole]} in ${data.basinName}:`;
+
+                listEl.innerHTML = '';
+                const basinGuidance = {
+  babahoyo: {
+    farmer: {
+      ar: ["راجع مناطق المياه المرصودة حول الحقول المنخفضة قبل الري أو تحريك المعدات.", "تابع المصارف وقنوات التصريف بعد الأمطار.", "خطط لنقل المحاصيل عبر طرق آمنة بعيدًا عن مناطق تجمع المياه."],
+      en: ["Review observed water areas around low-lying fields before irrigation or moving equipment.", "Monitor drains and drainage channels after rainfall.", "Plan crop transport on safer routes away from water-accumulation areas."]
+    },
+    tourist: {
+      ar: ["تحقق من الطرق القريبة من السهول النهرية قبل الرحلة.", "ابتعد عن ضفاف الأنهار ومناطق تجمع المياه عند صدور تحذيرات.", "اتبع تعليمات الجهات المحلية واختر نقاط توقف آمنة."],
+      en: ["Check roads near the river plains before travelling.", "Keep away from riverbanks and standing-water areas when alerts are issued.", "Follow local instructions and choose safe stopping points."]
+    },
+    resident: {
+      ar: ["تابع تحديثات المياه في المناطق السكنية المنخفضة.", "تعرّف على طرق الخروج الآمنة ونقاط التجمع الرسمية.", "لا تعبر الطرق المغمورة بالمياه."],
+      en: ["Monitor water updates in low-lying residential areas.", "Know the safe exit routes and official assembly points.", "Never cross flooded roads."]
+    }
+  },
+  lower_guayas: {
+    farmer: {
+      ar: ["قيّم الحقول وشبكات الصرف مع مراعاة الجريان القادم من مناطق أعلى الحوض.", "نسّق توقيت الري والصرف وفق تغير مناسيب المياه.", "تحقق من ملوحة المياه والتربة محليًا قبل استخدام المياه الساحلية للري."],
+      en: ["Assess fields and drainage networks while accounting for runoff from upstream areas.", "Coordinate irrigation and drainage with local water-level changes.", "Check local water and soil salinity before using coastal water for irrigation."]
+    },
+    tourist: {
+      ar: ["تحقق من الطرق القريبة من المصبات والمناطق الساحلية.", "راجع تنبيهات الأمطار والمد والجزر قبل التنقل.", "التزم بالممرات المسموح بها وابتعد عن حواف القنوات."],
+      en: ["Check roads near outlets and coastal areas.", "Review rainfall and tide advisories before travelling.", "Stay on permitted routes and keep clear of channel edges."]
+    },
+    resident: {
+      ar: ["تابع مناسيب المياه في المناطق المنخفضة وتأثير الجريان القادم من أعلى الحوض.", "راجع تنبيهات الأمطار والمد والجزر قبل استخدام الطرق الساحلية.", "احتفظ بخطة انتقال إلى مناطق أعلى عند صدور تعليمات رسمية."],
+      en: ["Monitor water levels in low-lying communities and runoff arriving from upstream.", "Check rainfall and tide advisories before using coastal roads.", "Have a plan to move to higher ground if authorities issue instructions."]
+    }
+  },
+  daule: {
+    farmer: {
+      ar: ["قارن تغير المسطحات المائية المرصودة بحالة قنوات الري والصرف.", "تابع المناطق القريبة من المجاري المائية ومعابر المعدات بعد الأمطار.", "نسّق توزيع مياه الري مع الجهات المحلية."],
+      en: ["Compare observed water-extent changes with irrigation and drainage channel conditions.", "Monitor areas near waterways and equipment crossings after rainfall.", "Coordinate irrigation-water distribution with local authorities."]
+    },
+    tourist: {
+      ar: ["تحقق من حالة الطرق والجسور القريبة من مجاري المياه.", "تجنب الأنشطة قرب القنوات والضفاف عند ارتفاع المياه أو صدور تنبيهات.", "اتبع الإرشادات المحلية بشأن الوصول إلى المناطق الترفيهية."],
+      en: ["Check roads and bridges near waterways.", "Avoid activities near channels and riverbanks during high water or local alerts.", "Follow local guidance on access to recreational areas."]
+    },
+    resident: {
+      ar: ["تابع تغيرات المياه بالقرب من الأحياء والطرق المتصلة بنهر Daule.", "تعرّف على الطرق البديلة إذا تأثرت المعابر أو الشوارع القريبة من القنوات.", "تجنب الطرق التي تصدر الجهات المحلية تحذيرات بشأنها."],
+      en: ["Monitor water changes near communities and roads connected to the Daule River.", "Know alternative routes if crossings or streets near channels are affected.", "Avoid roads that local authorities have flagged as unsafe."]
+    }
+  },
+  vinces: {
+    farmer: {
+      ar: ["راجع رصد المياه في الأراضي الزراعية المنخفضة قبل تشغيل المعدات.", "افحص قنوات التصريف والممرات الزراعية بعد الأمطار.", "خطط للحصاد والنقل وفق حالة الطرق وتحديثات المياه."],
+      en: ["Review water observations over low-lying farmland before operating equipment.", "Check drainage channels and farm tracks after rainfall.", "Plan harvesting and transport around road conditions and water updates."]
+    },
+    tourist: {
+      ar: ["تحقق من حالة الطرق الريفية القريبة من السهول النهرية.", "ابتعد عن الضفاف والمناطق المنخفضة التي قد تتجمع فيها المياه.", "استخدم نقاط عبور معتمدة ولا تعبر الطرق المتأثرة بالمياه."],
+      en: ["Check rural roads near the river plains.", "Keep away from riverbanks and low-lying areas where water may collect.", "Use approved crossings and do not cross water-affected roads."]
+    },
+    resident: {
+      ar: ["تابع تحديثات المياه في الأراضي المنخفضة والطرق بين التجمعات السكنية.", "حدد مسارًا بديلًا للوصول إلى الخدمات الأساسية إذا تأثرت الطرق.", "اتبع التنبيهات الرسمية وتجنب عبور المياه المتجمعة."],
+      en: ["Monitor water updates for low-lying land and roads connecting communities.", "Identify an alternative route to essential services if roads are affected.", "Follow official alerts and avoid crossing accumulated water."]
+    }
+  }
+};
+
+document.querySelector('[data-i18n="ai-recs"]').textContent =
+  currentLang === 'ar' ? 'إرشادات مخصصة حسب الحوض' : 'Basin-Specific Guidance';
+
+const recommendationsToShow =
+  basinGuidance[currentBasin]?.[currentRole]?.[currentLang] || data.recommendations;
+
+recommendationsToShow.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'p-3 rounded-xl bg-slate-800/70 border border-slate-700/80 leading-relaxed';
+                    li.textContent = item;
+                    listEl.appendChild(li);
+                });
+            } catch (err) {
+                listEl.innerHTML = `<li class="p-3 rounded-xl bg-red-950/50 text-red-400">Error connecting to server. Make sure Node server is running!</li>`;
+            }
+        }
+
+        async function fetchGov() {
+            const container = document.getElementById('gov-cards');
+            container.innerHTML = `<div class="col-span-2 p-6 text-center text-cyan-400 animate-pulse">${currentLang === 'ar' ? 'جاري توليد التوصيات الاستراتيجية...' : 'Generating strategic recommendations...'}</div>`;
+
+            try {
+                const res = await fetch('/api/government', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ season: currentSeason, lang: currentLang })
+                });
+                const data = await res.json();
+
+                container.innerHTML = '';
+                data.cards.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-800/70 rounded-xl p-6 border border-slate-700 flex flex-col justify-between';
+                    div.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400">${card.basin}</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400">${card.impact}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-2">${card.title}</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">${card.desc}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
+                            <span>${currentLang === 'ar' ? 'حالة التنفيذ: مقترح هندسي' : 'Status: Planning Proposal'}</span>
+                            <span class="text-amber-400 font-bold">${currentLang === 'ar' ? 'إرشادات تخطيطية مستندة إلى مؤشرات الرصد' : 'Planning Guidance Informed by Observed Indicators'}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                container.innerHTML = `<div class="col-span-2 p-6 text-center text-red-400">Failed to load government data.</div>`;
+            }
+        }
+
+        // Initial load
+        fetchAnalysis();
+    </script>
+
+<script>
+(function () {
+  "use strict";
+
+  const FILES = {
+    polygons: "/data/nasa/basins.geojson",
+    rivers: "/data/reference/hydrorivers/guayas_rivers.geojson"
+  };
+
+  const PFAF = {
+    "67202300": "daule",
+    "67202210": "babahoyo",
+    "67202230": "vinces",
+    "67202100": "lower_guayas"
+  };
+
+  const STORIES = {
+    babahoyo: {
+      en: "The Babahoyo system receives runoff from a broad upstream catchment and connected tributaries. During prolonged heavy rainfall, river levels can rise and water can spread across low-gradient floodplain areas. Flood impacts depend on rainfall distribution, upstream inflows, and downstream river levels.",
+      ar: "\u064a\u0633\u062a\u0642\u0628\u0644 \u0646\u0638\u0627\u0645 \u0646\u0647\u0631 \u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648 \u0645\u064a\u0627\u0647 \u0627\u0644\u062c\u0631\u064a\u0627\u0646 \u0627\u0644\u0633\u0637\u062d\u064a \u0645\u0646 \u062d\u0648\u0636 \u062a\u0635\u0631\u064a\u0641 \u0648\u0627\u0633\u0639 \u0648\u0631\u0648\u0627\u0641\u062f \u0645\u062a\u0635\u0644\u0629 \u0628\u0647. \u0648\u0645\u0639 \u0627\u0633\u062a\u0645\u0631\u0627\u0631 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u063a\u0632\u064a\u0631\u0629\u060c \u0642\u062f \u062a\u0631\u062a\u0641\u0639 \u0645\u0646\u0627\u0633\u064a\u0628 \u0627\u0644\u0646\u0647\u0631 \u0648\u062a\u0646\u062a\u0634\u0631 \u0627\u0644\u0645\u064a\u0627\u0647 \u0641\u064a \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0633\u0647\u0644 \u0627\u0644\u0641\u064a\u0636\u064a \u0645\u0646\u062e\u0641\u0636\u0629 \u0627\u0644\u0627\u0646\u062d\u062f\u0627\u0631. \u0648\u062a\u062a\u0623\u062b\u0631 \u0634\u062f\u0629 \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0628\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0648\u062a\u062f\u0641\u0642\u0627\u062a \u0627\u0644\u0631\u0648\u0627\u0641\u062f \u0648\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0645\u064a\u0627\u0647."
+    },
+    daule: {
+      en: "The Daule basin collects runoff from a large network of tributaries. Heavy rainfall across the catchment can increase river discharge, while low-gradient downstream reaches may slow drainage. Flood conditions are influenced by upstream rainfall and water levels near the Daule-Babahoyo confluence.",
+      ar: "\u064a\u062c\u0645\u0639 \u062d\u0648\u0636 \u0646\u0647\u0631 \u062f\u0627\u0648\u0644\u064a \u0645\u064a\u0627\u0647 \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0639\u0628\u0631 \u0634\u0628\u0643\u0629 \u0648\u0627\u0633\u0639\u0629 \u0645\u0646 \u0627\u0644\u0631\u0648\u0627\u0641\u062f. \u0648\u0642\u062f \u062a\u0624\u062f\u064a \u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u063a\u0632\u064a\u0631\u0629 \u0641\u064a \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u062d\u0648\u0636 \u0625\u0644\u0649 \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0646\u0647\u0631\u064a\u060c \u0628\u064a\u0646\u0645\u0627 \u0642\u062f \u062a\u0624\u062f\u064a \u0627\u0644\u0645\u0646\u0627\u0637\u0642 \u0645\u0646\u062e\u0641\u0636\u0629 \u0627\u0644\u0627\u0646\u062d\u062f\u0627\u0631 \u0642\u0631\u0628 \u0627\u0644\u0645\u0635\u0628 \u0625\u0644\u0649 \u0625\u0628\u0637\u0627\u0621 \u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0645\u064a\u0627\u0647. \u0648\u062a\u062a\u0623\u062b\u0631 \u0638\u0631\u0648\u0641 \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0628\u0627\u0644\u0623\u0645\u0637\u0627\u0631 \u0648\u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647 \u0642\u0631\u0628 \u0646\u0642\u0637\u0629 \u0627\u0644\u062a\u0642\u0627\u0621 \u062f\u0627\u0648\u0644\u064a \u0648\u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648."
+    },
+    vinces: {
+      en: "The Vinces river system drains its own upstream catchment before joining the wider Babahoyo river network. Intense rainfall can generate runoff into tributaries and raise river levels. Flooding can become more extensive where high flows meet low-lying floodplain areas and downstream water levels are elevated.",
+      ar: "\u064a\u0635\u0631\u0641 \u0646\u0638\u0627\u0645 \u0646\u0647\u0631 \u0641\u064a\u0646\u0633\u064a\u0633 \u0645\u064a\u0627\u0647 \u062d\u0648\u0636\u0647 \u0642\u0628\u0644 \u0627\u062a\u0635\u0627\u0644\u0647 \u0628\u0634\u0628\u0643\u0629 \u0646\u0647\u0631 \u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648 \u0627\u0644\u0623\u0648\u0633\u0639. \u0648\u064a\u0645\u0643\u0646 \u0644\u0644\u0623\u0645\u0637\u0627\u0631 \u0627\u0644\u0634\u062f\u064a\u062f\u0629 \u0623\u0646 \u062a\u0632\u064a\u062f \u0627\u0644\u062c\u0631\u064a\u0627\u0646 \u0627\u0644\u0633\u0637\u062d\u064a \u0641\u064a \u0627\u0644\u0631\u0648\u0627\u0641\u062f \u0648\u062a\u0631\u0641\u0639 \u0645\u0646\u0633\u0648\u0628 \u0627\u0644\u0646\u0647\u0631. \u0648\u0642\u062f \u064a\u0645\u062a\u062f \u0627\u0644\u0641\u064a\u0636\u0627\u0646 \u0641\u064a \u0627\u0644\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0645\u0646\u062e\u0641\u0636\u0629 \u0639\u0646\u062f\u0645\u0627 \u062a\u062a\u0632\u0627\u0645\u0646 \u0627\u0644\u062a\u062f\u0641\u0642\u0627\u062a \u0627\u0644\u0645\u0631\u062a\u0641\u0639\u0629 \u0645\u0639 \u0627\u0631\u062a\u0641\u0627\u0639 \u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647."
+    },
+    lower_guayas: {
+      en: "The Lower Guayas is a downstream river system connected to the Daule and Babahoyo confluence. High upstream discharge can increase water levels through the lower river corridor. Near the estuary, tidal conditions may also influence how quickly river water drains. This catchment is cumulative and should not be interpreted as an independent upstream basin.",
+      ar: "\u064a\u0645\u062b\u0644 \u062d\u0648\u0636 \u063a\u0648\u0627\u064a\u0627\u0633 \u0627\u0644\u0633\u0641\u0644\u064a \u0646\u0638\u0627\u0645\u064b\u0627 \u0646\u0647\u0631\u064a\u064b\u0627 \u064a\u0631\u062a\u0628\u0637 \u0628\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u062a\u0642\u0627\u0621 \u0646\u0647\u0631\u064a \u062f\u0627\u0648\u0644\u064a \u0648\u0628\u0627\u0628\u0627\u0647\u0648\u064a\u0648. \u0648\u064a\u0645\u0643\u0646 \u0644\u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0642\u0627\u062f\u0645 \u0645\u0646 \u0623\u0639\u0644\u0649 \u0627\u0644\u062d\u0648\u0636 \u0623\u0646 \u062a\u0631\u0641\u0639 \u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0627\u0644\u0645\u064a\u0627\u0647 \u0641\u064a \u0627\u0644\u0645\u062c\u0631\u0649 \u0627\u0644\u0633\u0641\u0644\u064a. \u0648\u0628\u0627\u0644\u0642\u0631\u0628 \u0645\u0646 \u0627\u0644\u0645\u0635\u0628\u060c \u0642\u062f \u062a\u0624\u062b\u0631 \u062d\u0631\u0643\u0629 \u0627\u0644\u0645\u062f \u0648\u0627\u0644\u062c\u0632\u0631 \u0623\u064a\u0636\u064b\u0627 \u0641\u064a \u0633\u0631\u0639\u0629 \u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0645\u064a\u0627\u0647. \u0648\u0647\u0630\u0627 \u0627\u0644\u062d\u0648\u0636 \u062a\u0631\u0627\u0643\u0645\u064a\u060c \u0644\u0630\u0644\u0643 \u0644\u0627 \u064a\u0646\u0628\u063a\u064a \u0627\u0639\u062a\u0628\u0627\u0631\u0647 \u062d\u0648\u0636\u064b\u0627 \u0645\u0633\u062a\u0642\u0644\u064b\u0627 \u0639\u0646 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u062a\u0635\u0631\u064a\u0641 \u0627\u0644\u0639\u0644\u064a\u0627."
+    }
+  };
+
+  let map, riverLayer, basinLayer, polygonData, riverData;
+  let selectedBasin = "babahoyo";
+  let mapReady = false;
+
+  function normalizeBasin(value) {
+    const v = String(value || "").toLowerCase().replace(/[\s-]+/g, "_");
+    if (v.includes("lower") || v.includes("guayas")) return "lower_guayas";
+    if (v.includes("babahoyo")) return "babahoyo";
+    if (v.includes("vinces")) return "vinces";
+    if (v.includes("daule")) return "daule";
+    return v;
+  }
+
+  function arabicMode() {
+    const root = document.documentElement;
+    return root.dir === "rtl" ||
+      (root.lang || "").toLowerCase().startsWith("ar") ||
+      document.body.dir === "rtl";
+  }
+
+  function updateStory(basin) {
+    const el = document.getElementById("story-text");
+    const story = STORIES[normalizeBasin(basin || selectedBasin)];
+    if (el && story) el.textContent = arabicMode() ? story.ar : story.en;
+  }
+
+  function loadLeaflet() {
+    return new Promise((resolve, reject) => {
+      if (window.L) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+      script.crossOrigin = "";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Leaflet failed to load"));
+      document.head.appendChild(script);
+    });
+  }
+
+  function pfafOf(feature) {
+    const p = feature.properties || {};
+    return String(p.pfaf_id || p.PFAF_ID || "").replace(/\.0$/, "");
+  }
+
+  function drawBasin(basin) {
+    if (!map || !polygonData || !riverData) return;
+    selectedBasin = normalizeBasin(basin);
+
+    if (riverLayer) map.removeLayer(riverLayer);
+    if (basinLayer) map.removeLayer(basinLayer);
+
+    const selectedPfaf = Object.keys(PFAF).find(k => PFAF[k] === selectedBasin);
+
+    const polygons = {
+      type: "FeatureCollection",
+      features: polygonData.features.filter(f => pfafOf(f) === selectedPfaf)
+    };
+
+    const rivers = {
+      type: "FeatureCollection",
+      features: riverData.features.filter(
+        f => normalizeBasin(f.properties && f.properties.basinId) === selectedBasin
+      )
+    };
+
+    basinLayer = L.geoJSON(polygons, {
+      style: { color: "#d97706", weight: 2.5, fillColor: "#fbbf24", fillOpacity: 0.12 }
+    }).addTo(map);
+
+    riverLayer = L.geoJSON(rivers, {
+      style: feature => {
+        const order = Number(feature.properties && feature.properties.streamOrder || 1);
+        return {
+          color: order >= 4 ? "#075985" : "#0ea5e9",
+          weight: order >= 4 ? 3.2 : 2,
+          opacity: 0.9,
+          className: "river-flow-line"
+        };
+      }
+    }).addTo(map);
+
+    const bounds = L.featureGroup([basinLayer, riverLayer]).getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [18, 18], maxZoom: 10 });
+    updateStory(selectedBasin);
+  }
+
+  async function initializeMap() {
+    const container = document.getElementById("basin-map");
+    if (!container) return;
+
+    try {
+      await loadLeaflet();
+
+      const responses = await Promise.all([
+        fetch(FILES.polygons),
+        fetch(FILES.rivers)
+      ]);
+
+      if (!responses.every(r => r.ok)) {
+        throw new Error("GeoJSON files could not be loaded");
+      }
+
+      [polygonData, riverData] = await Promise.all(responses.map(r => r.json()));
+
+      map = L.map(container, { scrollWheelZoom: false });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+
+      mapReady = true;
+      drawBasin(selectedBasin);
+      setTimeout(() => map && map.invalidateSize(), 250);
+
+    } catch (error) {
+      console.error("HydroVision map error:", error);
+      container.innerHTML =
+        '<div style="padding:18px;color:#334155;">Map could not load. Check internet access and GeoJSON file paths.</div>';
+    }
+  }
+
+  function connectControls() {
+    if (typeof window.setBasin === "function" && !window.setBasin.__hydroWrapped) {
+      const original = window.setBasin;
+      const wrapped = function (basin) {
+        selectedBasin = normalizeBasin(basin);
+        updateStory(selectedBasin);
+        const result = original.apply(this, arguments);
+        if (mapReady) drawBasin(selectedBasin);
+        if (result && typeof result.then === "function") {
+          return result.then(value => {
+            updateStory(selectedBasin);
+            return value;
+          });
+        }
+        updateStory(selectedBasin);
+        return result;
+      };
+      wrapped.__hydroWrapped = true;
+      window.setBasin = wrapped;
+    }
+
+    if (typeof window.fetchAnalysis === "function" && !window.fetchAnalysis.__hydroWrapped) {
+      const original = window.fetchAnalysis;
+      const wrapped = async function () {
+        const result = await original.apply(this, arguments);
+        updateStory(selectedBasin);
+        return result;
+      };
+      wrapped.__hydroWrapped = true;
+      window.fetchAnalysis = wrapped;
+    }
+
+    ["setLanguage", "toggleLanguage", "changeLanguage"].forEach(name => {
+      if (typeof window[name] === "function" && !window[name].__hydroWrapped) {
+        const original = window[name];
+        const wrapped = function () {
+          const result = original.apply(this, arguments);
+          updateStory(selectedBasin);
+          return result;
+        };
+        wrapped.__hydroWrapped = true;
+        window[name] = wrapped;
+      }
+    });
+
+    new MutationObserver(() => updateStory(selectedBasin)).observe(
+      document.documentElement,
+      { attributes: true, attributeFilter: ["dir", "lang"] }
+    );
+  }
+
+  function start() {
+    connectControls();
+    updateStory(selectedBasin);
+    initializeMap();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+
+  window.hydroVisionUpdateBasinMap = function (basin) {
+    selectedBasin = normalizeBasin(basin);
+    if (mapReady) drawBasin(selectedBasin);
+    else updateStory(selectedBasin);
+  };
+})();
+</script>
+
+</body>
+</html>
+

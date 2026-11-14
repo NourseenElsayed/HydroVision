@@ -1,0 +1,5 @@
+basin,basin_area_km2,scene_valid_km2,scene_coverage_pct,permanent_water_km2,new_open_water_km2,flooded_vegetation_proxy_km2,new_flood_total_km2,new_flood_pct_of_valid_scene_area,mean_baseline_HV_dB,mean_elevation_m,mean_slope_deg,mean_flood_HAND_approx_m,status
+Daule,13504.6,12809.31,94.9,67.68,184.63,1513.27,1697.9,13.26,-14.0,141.7,6.13,6.8,provisional threshold estimate
+Babahoyo,18668.0,17344.93,92.9,149.66,347.65,2241.56,2589.21,14.93,-14.03,1124.2,11.12,26.5,provisional threshold estimate
+Vinces,13643.0,13638.27,100.0,121.25,298.3,1672.64,1970.94,14.45,-13.69,752.4,9.64,6.3,provisional threshold estimate
+Lower Guayas,32535.7,30154.24,92.7,217.34,532.28,3754.84,4287.11,14.22,-14.02,703.9,8.93,18.7,provisional threshold estimate

@@ -1,0 +1,55 @@
+{
+  "project": "HydroVision",
+  "source": "HydroRIVERS v1.0 South America",
+  "catchmentSource": "HydroBASINS v1c level 12",
+  "totalRiverSegments": 84,
+  "basins": {
+    "daule": {
+      "name": "Daule",
+      "pfafPrefix": "67202300",
+      "level12Catchments": 2,
+      "riverSegments": 17,
+      "totalSegmentLengthKm": 77.17,
+      "streamOrderDistribution": {
+        "4": 7,
+        "7": 9,
+        "6": 1
+      }
+    },
+    "babahoyo": {
+      "name": "Babahoyo",
+      "pfafPrefix": "67202210",
+      "level12Catchments": 1,
+      "riverSegments": 19,
+      "totalSegmentLengthKm": 58.8,
+      "streamOrderDistribution": {
+        "7": 10,
+        "4": 9
+      }
+    },
+    "vinces": {
+      "name": "Vinces",
+      "pfafPrefix": "67202230",
+      "level12Catchments": 3,
+      "riverSegments": 23,
+      "totalSegmentLengthKm": 100.1,
+      "streamOrderDistribution": {
+        "7": 12,
+        "4": 3,
+        "6": 8
+      }
+    },
+    "lower_guayas": {
+      "name": "Lower Guayas",
+      "pfafPrefix": "67202100",
+      "level12Catchments": 3,
+      "riverSegments": 25,
+      "totalSegmentLengthKm": 102.85,
+      "streamOrderDistribution": {
+        "7": 16,
+        "6": 4,
+        "3": 5
+      }
+    }
+  }
+}
