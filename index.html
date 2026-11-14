@@ -54,6 +54,38 @@
 .hv-team-en{color:#94a3b8;font-size:11px;margin-top:3px;direction:ltr;text-align:start}
 @media(max-width:520px){.hv-team-section{padding:22px 15px}}
 
+/* Team section follows the site's active language and color theme */
+html[data-hv-theme="dark"] .hv-team-section{
+  background:linear-gradient(135deg,rgba(20,39,34,.97),rgba(12,29,30,.96));
+  border-color:rgba(45,212,191,.25);
+  color:#f1f5f9;
+}
+html[data-hv-theme="light"] .hv-team-section{
+  background:linear-gradient(135deg,rgba(255,251,239,.97),rgba(231,241,226,.97));
+  border-color:rgba(85,112,83,.3);
+  box-shadow:0 14px 34px rgba(46,63,48,.10);
+  color:#293d34;
+}
+html[data-hv-theme="light"] .hv-team-title,
+html[data-hv-theme="light"] .hv-team-ar{color:#244638}
+html[data-hv-theme="light"] .hv-team-subtitle,
+html[data-hv-theme="light"] .hv-team-en{color:#625b4e}
+html[data-hv-theme="light"] .hv-team-name{
+  background:rgba(255,255,255,.64);
+  border-color:rgba(85,112,83,.2);
+}
+html[data-hv-theme="light"] .hv-team-avatar{
+  background:rgba(39,169,154,.14);
+  color:#176b5d;
+}
+html[lang="ar"] .hv-team-ar{display:block}
+html[lang="ar"] .hv-team-en{display:none}
+html[lang="en"] .hv-team-ar,
+html[lang="es"] .hv-team-ar{display:none}
+html[lang="en"] .hv-team-en,
+html[lang="es"] .hv-team-en{display:block}
+
+
 </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1989,10 +2021,10 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
         <!-- HV_DEVELOPMENT_TEAM -->
         <section id="hv-development-team" class="hv-team-section" aria-labelledby="hv-team-heading" dir="auto">
             <div class="text-center mb-6">
-                <div class="hv-team-kicker">THE PEOPLE BEHIND HYDROVISION</div>
-                <h2 id="hv-team-heading" class="hv-team-title">فريق تطوير الموقع</h2>
-                <p class="hv-team-subtitle">مجرة ضرب الدبانة · Magaret Darb El Debbanah</p>
-                <p class="hv-team-subtitle">Web Development Team</p>
+                <div class="hv-team-kicker" data-i18n="team-kicker">الفريق وراء HydroVision</div>
+                <h2 id="hv-team-heading" class="hv-team-title" data-i18n="team-title">فريق تطوير الموقع</h2>
+                <p class="hv-team-subtitle hv-team-identity">مجرة ضرب الدبانة · Magaret Darb El Debbanah</p>
+                <p class="hv-team-subtitle" data-i18n="team-subtitle">فريق تطوير الموقع</p>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div class="hv-team-name"><div class="hv-team-avatar">م</div><div><div class="hv-team-ar">ملك محمد علي</div><div class="hv-team-en">Malak Mohamed Ali</div></div></div>
@@ -2047,6 +2079,9 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
                 'gov-desc': 'حلول هندسية وبيئية مقترحة بناءً على تحليل دورات الفيضان والجفاف عبر المواسم المختلفة.',
                 'season-1': '🌧️ موسم الفيضان (Season 1)',
                 'season-2': '☀️ موسم الجفاف (Season 2)',
+                'team-kicker': 'الفريق وراء HydroVision',
+                'team-title': 'فريق تطوير الموقع',
+                'team-subtitle': 'فريق تطوير الموقع',
                 'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
             },
             en: {
@@ -2079,6 +2114,9 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
                 'gov-desc': 'Proposed engineering and environmental solutions based on flood and drought cycle analysis across seasons.',
                 'season-1': '🌧️ Flood Season (Season 1)',
                 'season-2': '☀️ Drought Season (Season 2)',
+                'team-kicker': 'The People Behind HydroVision',
+                'team-title': 'Web Development Team',
+                'team-subtitle': 'Website Development Team',
                 'footer': 'HydroVision • NASA NISAR GCOV Data Platform'
             }
         };
@@ -2113,6 +2151,9 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
             "gov-desc": "Orientaciones para apoyar la evaluación y planificación local.",
             "season-1": "Temporada de inundaciones",
             "season-2": "Temporada seca",
+            "team-kicker": "El equipo detrás de HydroVision",
+            "team-title": "Equipo de desarrollo web",
+            "team-subtitle": "Equipo de desarrollo del sitio web",
             "footer": "HydroVision - Plataforma de datos NASA NISAR GCOV"
         };
 
@@ -2652,12 +2693,18 @@ recommendationsToShow.forEach(item => {
             }
 
             if (label) {
-                label.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+                var activeLang = root.getAttribute("lang") || "ar";
+                var themeLabels = {
+                    ar: theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن",
+                    en: theme === "dark" ? "Light mode" : "Dark mode",
+                    es: theme === "dark" ? "Modo claro" : "Modo oscuro"
+                };
+                label.textContent = themeLabels[activeLang] || themeLabels.en;
             }
 
             button.setAttribute(
                 "aria-label",
-                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+                (root.getAttribute("lang") === "ar" ? (theme === "dark" ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الداكن") : root.getAttribute("lang") === "es" ? (theme === "dark" ? "Cambiar al modo claro" : "Cambiar al modo oscuro") : (theme === "dark" ? "Switch to light mode" : "Switch to dark mode"))
             );
 
             button.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
