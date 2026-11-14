@@ -429,6 +429,9 @@ app.post('/api/assistant', async (req, res) => {
         const question = String(body.question || '').trim().slice(0, 1000);
         const lang = ['ar', 'en', 'es'].includes(body.lang) ? body.lang : 'en';
         const selectedBasin = BASINS[body.basinId] ? body.basinId : 'babahoyo';
+        const selectedRole = ['farmer', 'resident', 'fisher', 'trader', 'transport', 'livestock', 'tourist'].includes(String(body.role || '').toLowerCase())
+            ? String(body.role).toLowerCase()
+            : 'resident';
 
         if (!question) {
             return res.status(400).json({ error: 'Please enter a question.' });
@@ -750,6 +753,7 @@ app.post('/api/assistant', async (req, res) => {
                     project: 'HydroVision: AI-powered flood intelligence for Ecuador’s Guayas River Basin',
                     subBasins: ['Babahoyo', 'Lower Guayas', 'Daule', 'Vinces'],
                     selectedBasin: basinId,
+                    userRole: selectedRole,
                     language: lang,
                     nasaAnalysis: rows,
                     riverNetwork: riverData,
