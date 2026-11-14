@@ -4053,6 +4053,7 @@ function render(data){
   const desc=a.description||a.instruction||"";
   const tips=t.tips[role()]||t.tips.resident;
   html+='<article class="hv-fa-alert"><h4>'+esc(a.headline||a.event||"Official warning")+'</h4><div class="hv-fa-pill '+esc(a.severity)+'">'+severityLabel(a.severity)+'</div>';
+  html+='<p style="font-weight:900;color:#9d341f">'+(lang()==="ar"?"في حالة وجود خطر مباشر، اتصل بالطوارئ 911.":lang()==="es"?"Si hay peligro inmediato, llama al 911.":"If there is immediate danger, call emergency services at 911.")+'</p>';
   if(desc)html+='<p>'+esc(desc.slice(0,1000))+'</p>';
   if(a.areas&&a.areas.length)html+='<p><b>'+(lang()==="ar"?"المناطق:":lang()==="es"?"Zonas:":"Areas:")+'</b> '+esc(a.areas.join(" · "))+'</p>';
   if(a.expires)html+='<p>'+(lang()==="ar"?"ساري حتى:":lang()==="es"?"Válido hasta:":"Valid until:")+' '+esc(time(a.expires))+'</p>';
@@ -4061,6 +4062,7 @@ function render(data){
  html+='<div class="hv-fa-actions"><button type="button" class="primary" id="hv-fa-enable">'+(("Notification" in window&&Notification.permission==="granted")?t.enabled:t.enable)+'</button><a href="'+sourceUrl+'" target="_blank" rel="noopener noreferrer">'+t.official+'</a></div>';
  html+='<div class="hv-fa-meta">'+t.updated+': '+esc(time(data.checkedAt))+'<br>'+t.disclaimer+'</div>';
  panel.innerHTML=html;
+ if(alerts.length){root.classList.add("hv-fa-open");toggle.setAttribute("aria-expanded","true")}
  const enable=document.getElementById("hv-fa-enable");
  if(enable)enable.addEventListener("click",async()=>{
   if(!("Notification" in window)){enable.textContent="Browser notifications unavailable";return}
