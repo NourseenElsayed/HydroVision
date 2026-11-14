@@ -608,7 +608,7 @@ app.post('/api/assistant', async (req, res) => {
             rivers: has('river', 'rivers', 'stream', 'hydrorivers', 'river network', 'نهر', 'انهار', 'الانهار', 'مجرى', 'شبكة الانهار', 'مقاطع', 'rio', 'rios', 'red fluvial'),
             comparison: has('compare', 'comparison', 'compare all', 'all basins', 'which basin', 'largest basin', 'highest basin', 'versus', ' vs ', 'مقارن', 'قارن', 'مقارنة', 'كل الاحواض', 'الاحواض كلها', 'اي حوض', 'اكبر حوض', 'اعلى حوض', 'comparar', 'comparacion', 'todas las cuencas', 'que cuenca', 'mayor cuenca'),
             why: has('why', 'reason', 'cause', 'explain why', 'ليه', 'لماذا', 'السبب', 'اسباب', 'عشان ايه', 'por que', 'causa', 'razon'),
-            overview: has('what is hydrovision', 'about hydrovision', 'project overview', 'what does this project do', 'عرفني بالمشروع', 'ايه هو المشروع', 'المشروع ده', 'فكرة المشروع', 'هدف المشروع', 'عن المشروع', 'que es hydrovision', 'objetivo del proyecto'),
+            overview: has('what is hydrovision', 'about hydrovision', 'project overview', 'what does this project do', 'عرفني بالمشروع', 'ايه هو المشروع', 'المشروع ده', 'فكرة المشروع', 'هدف المشروع', 'عن المشروع', 'اشرحلي المشروع', 'اشرحلي الموقع', 'الموقع ده بيعمل ايه', 'platform', 'que es hydrovision', 'objetivo del proyecto'),
             seasonal: has('season', 'rainy season', 'dry season', 'wet season', 'monsoon', 'موسم الامطار', 'موسم المطر', 'موسم الجفاف', 'الشتاء', 'الصيف', 'el nino', 'temporada lluviosa', 'temporada seca'),
             history: has('river history', 'history of the river', 'how was the river formed', 'تاريخ النهر', 'نشأة النهر', 'اتكون ازاي', 'تكون النهر', 'قصة النهر', 'historia del rio', 'origen del rio'),
             alerts: has('alert', 'warning', 'early warning', 'notification', 'flood warning', 'انذار', 'تنبيه', 'اشعار', 'تحذير', 'فيضان جاي', 'هل في فيضان', 'alerta', 'aviso'),
@@ -717,7 +717,7 @@ app.post('/api/assistant', async (req, res) => {
         if (intents.sources) add(knowledge.sources);
         if (intents.features) add(knowledge.features);
         if (intents.emergency) add(knowledge.emergency);
-        if (intents.livestock && !intents.sectors) add(knowledge.livestock);
+        if (intents.livestock) add(knowledge.livestock);
 
         if (intents.rivers) {
             const r = riverData && riverData.basins && riverData.basins[basinId];
