@@ -3847,6 +3847,71 @@ if (page === "map" && typeof window.hydroVisionUpdateBasinMap === "function") {
 const old=window.toggleLanguage;if(typeof old==="function")window.toggleLanguage=function(){const v=old.apply(this,arguments);applyLanguage();return v;};
 })();
 </script>
+
+<!-- HV_LIGHT_MODE_FINAL_CONTRAST_SWEEP_V2 -->
+<style id="hv-light-mode-final-contrast">
+/* Final light-mode contrast pass: make every normal content label readable */
+html[data-hv-theme="light"] main.hv-layout-main :is(
+  h1,h2,h3,h4,h5,h6,p,li,label,small,strong,b,em,
+  td,th,caption,dt,dd,figcaption,summary,blockquote,
+  a:not(.hv-rs-source a),span,legend
+) {
+  color: #263b30 !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main :is(
+  .text-white,.text-slate-50,.text-slate-100,.text-slate-200,
+  .text-slate-300,.text-slate-400,.text-slate-500,
+  .text-gray-100,.text-gray-200,.text-gray-300,.text-gray-400,
+  .text-zinc-100,.text-zinc-200,.text-zinc-300,.text-zinc-400
+) {
+  color: #354b3d !important;
+}
+/* Keep deliberate dark/photo panels and their overlay typography light */
+html[data-hv-theme="light"] #view-public > .glass-card:first-child :is(h1,h2,h3,p,span,strong),
+html[data-hv-theme="light"] .hv-rs-screen-copy :is(h3,p,span,strong),
+html[data-hv-theme="light"] .hv-rs-counter {
+  color: #fff4dc !important;
+}
+html[data-hv-theme="light"] .hv-rs-source a { color: #126b60 !important; }
+/* Controls, selected states, and navigation */
+html[data-hv-theme="light"] main.hv-layout-main button:not(.active-btn):not(.hv-rs-btn):not(.hv-rs-chapter[aria-pressed="true"]) {
+  color: #263b30 !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main .active-btn,
+html[data-hv-theme="light"] main.hv-layout-main .hv-rs-btn,
+html[data-hv-theme="light"] main.hv-layout-main .hv-rs-chapter[aria-pressed="true"],
+html[data-hv-theme="light"] #hv-theme-toggle {
+  color: #fff !important;
+}
+html[data-hv-theme="light"] #hv-sidebar,
+html[data-hv-theme="light"] #hv-sidebar * {
+  color: #263f34 !important;
+}
+html[data-hv-theme="light"] #hv-sidebar .hv-side-link.active {
+  color: #20372e !important;
+}
+/* Data panels, tables, and secondary surfaces */
+html[data-hv-theme="light"] main.hv-layout-main table,
+html[data-hv-theme="light"] main.hv-layout-main thead,
+html[data-hv-theme="light"] main.hv-layout-main tbody,
+html[data-hv-theme="light"] main.hv-layout-main tr {
+  color: #263b30 !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main input,
+html[data-hv-theme="light"] main.hv-layout-main textarea,
+html[data-hv-theme="light"] main.hv-layout-main select,
+html[data-hv-theme="light"] main.hv-layout-main option {
+  color: #20372e !important;
+  background-color: #fff !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main input::placeholder,
+html[data-hv-theme="light"] main.hv-layout-main textarea::placeholder {
+  color: #68776b !important;
+  opacity: 1 !important;
+}
+</style>
+<!-- /HV_LIGHT_MODE_FINAL_CONTRAST_SWEEP_V2 -->
+
 </body>
 </html>
 
