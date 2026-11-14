@@ -4016,6 +4016,10 @@ html[data-hv-theme="light"] body footer * {
 (function(){
 "use strict";
 const root=document.getElementById("hv-flood-alert-root");
+/* Keep the alert widget at body level so fixed positioning is identical on every routed page. */
+if(root&&root.parentElement!==document.body)document.body.appendChild(root);
+if(root){root.style.setProperty("position","fixed","important");root.style.setProperty("right",window.matchMedia("(max-width: 600px)").matches?"12px":"22px","important");root.style.setProperty("bottom",window.matchMedia("(max-width: 600px)").matches?"72px":"86px","important");root.style.setProperty("z-index","99998","important");}
+window.addEventListener("resize",()=>{if(root){const small=window.matchMedia("(max-width: 600px)").matches;root.style.setProperty("right",small?"12px":"22px","important");root.style.setProperty("bottom",small?"72px":"86px","important");}});
 const panel=document.getElementById("hv-flood-alert-panel");
 const toggle=document.getElementById("hv-flood-alert-toggle");
 const statusEl=document.getElementById("hv-fa-toggle-status");
