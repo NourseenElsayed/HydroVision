@@ -1660,13 +1660,18 @@ html[data-hv-theme="light"] main.hv-layout-main .text-slate-500 {
 }
 /* Preserve white lettering on intentionally dark/colored controls and the photo hero */
 html[data-hv-theme="light"] main.hv-layout-main button,
-html[data-hv-theme="light"] #hv-theme-toggle,
-html[data-hv-theme="light"] #view-public > .glass-card:first-child,
-html[data-hv-theme="light"] #view-public > .glass-card:first-child * ,
-html[data-hv-theme="light"] .hv-rs-screen,
-html[data-hv-theme="light"] .hv-rs-screen * {
+html[data-hv-theme="light"] #hv-theme-toggle {
   color: inherit;
 }
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h1,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child h2,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child p,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child span {
+  color: #fff4dc !important;
+}
+html[data-hv-theme="light"] .hv-rs-screen-copy h3 { color: #fff8e9 !important; }
+html[data-hv-theme="light"] .hv-rs-screen-copy p { color: #e1e9df !important; }
+html[data-hv-theme="light"] .hv-rs-counter { color: #f2c779 !important; }
 html[data-hv-theme="light"] main.hv-layout-main .active-btn,
 html[data-hv-theme="light"] main.hv-layout-main .hv-rs-btn,
 html[data-hv-theme="light"] main.hv-layout-main .hv-rs-chapter[aria-pressed="true"] {
