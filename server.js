@@ -759,6 +759,28 @@ function hvParseCapFeed(xml, basinId) {
             });
         }
     }
+    if (!capBlocks.length) {
+        const items = [...String(xml).matchAll(/<item\\b[^>]*>([\\s\\S]*?)<\\/item\\s*>/gi)].map(m => m[1]);
+        for (const item of items) {
+            const headline = hvXmlTag(item, 'title') || 'Official weather or hydrological alert';
+            const description = hvXmlTag(item, 'description');
+            const link = hvXmlTag(item, 'link');
+            const searchable = normalizeText([headline, description].join(' '));
+            if (!wantedAreas.some(area => searchable.includes(area))) continue;
+            if (!/(lluv|rain|precip|torment|storm|inund|flood|crecid|river|hidrolog)/i.test(searchable)) continue;
+            const level = searchable.includes('extrema') || searchable.includes('extreme') ? 'extreme'
+                : searchable.includes('severa') || searchable.includes('severe') ? 'severe'
+                : searchable.includes('moderada') || searchable.includes('moderate') ? 'moderate' : 'minor';
+            alerts.push({
+                id: hvXmlTag(item, 'guid') || link || headline,
+                headline, event: headline, description, instruction: '',
+                areas: wantedAreas.filter(area => searchable.includes(area)),
+                severity: level, sent: hvXmlTag(item, 'pubDate'),
+                expires: '', source: 'INAMHI CAP RSS',
+                sourceUrl: link || 'https://servicios.inamhi.gob.ec/alertas/'
+            });
+        }
+    }
     return alerts;
 }
 app.get('/api/flood-alerts', async (req, res) => {
