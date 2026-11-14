@@ -698,6 +698,103 @@ app.post('/api/assistant', (req, res) => {
     }
 });
 
+
+// HV_OFFICIAL_FLOOD_ALERTS_CAP_V1
+function hvXmlDecode(value) {
+    return String(value || '')
+        .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+        .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+}
+function hvXmlTag(xml, name) {
+    const re = new RegExp('<(?:[\\w.-]+:)?' + name + '(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?' + name + '\\s*>', 'i');
+    const match = String(xml || '').match(re);
+    return match ? hvXmlDecode(match[1]).replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim() : '';
+}
+function hvParseCapFeed(xml, basinId) {
+    const areasByBasin = {
+        babahoyo: ['los rios', 'babahoyo'],
+        vinces: ['los rios', 'vinces'],
+        daule: ['guayas', 'daule'],
+        lower_guayas: ['guayas', 'los rios', 'lower guayas']
+    };
+    const wantedAreas = areasByBasin[basinId] || areasByBasin.babahoyo;
+    const normalizeText = value => String(value || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+    const alerts = [];
+    const capBlocks = [...String(xml).matchAll(/<(?:[\\w.-]+:)?alert\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?alert\\s*>/gi)].map(m => m[1]);
+    for (const block of capBlocks) {
+        const status = hvXmlTag(block, 'status') || 'Actual';
+        const scope = hvXmlTag(block, 'scope') || 'Public';
+        if (!/^actual$/i.test(status) || !/^public$/i.test(scope)) continue;
+        const infos = [...block.matchAll(/<(?:[\\w.-]+:)?info\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?info\\s*>/gi)].map(m => m[1]);
+        for (const info of (infos.length ? infos : [block])) {
+            const headline = hvXmlTag(info, 'headline') || hvXmlTag(info, 'event') || 'Official weather or hydrological alert';
+            const event = hvXmlTag(info, 'event');
+            const description = hvXmlTag(info, 'description');
+            const instruction = hvXmlTag(info, 'instruction');
+            const areas = [...info.matchAll(/<(?:[\\w.-]+:)?areaDesc(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?areaDesc\\s*>/gi)]
+                .map(m => hvXmlDecode(m[1]).replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim());
+            const searchable = normalizeText([headline, event, description, instruction, areas.join(' ')].join(' '));
+            const areaText = normalizeText(areas.join(' ') + ' ' + description);
+            if (!wantedAreas.some(area => areaText.includes(area))) continue;
+            if (!/(lluv|rain|precip|torment|storm|inund|flood|crecid|river|hidrolog)/i.test(searchable)) continue;
+            const expires = hvXmlTag(info, 'expires');
+            if (expires && Number.isFinite(Date.parse(expires)) && Date.parse(expires) < Date.now()) continue;
+            const severityRaw = hvXmlTag(info, 'severity').toLowerCase();
+            const severity = severityRaw === 'extreme' ? 'extreme' : severityRaw === 'severe' ? 'severe' : severityRaw === 'moderate' ? 'moderate' : 'minor';
+            const identifier = hvXmlTag(block, 'identifier') || hvXmlTag(block, 'sender') + '|' + hvXmlTag(block, 'sent') + '|' + headline;
+            alerts.push({
+                id: identifier + '|' + headline,
+                headline, event, description, instruction, areas,
+                severity, urgency: hvXmlTag(info, 'urgency'),
+                certainty: hvXmlTag(info, 'certainty'),
+                sent: hvXmlTag(block, 'sent'),
+                effective: hvXmlTag(info, 'effective'),
+                onset: hvXmlTag(info, 'onset'),
+                expires,
+                source: 'INAMHI CAP',
+                sourceUrl: 'https://servicios.inamhi.gob.ec/alertas/'
+            });
+        }
+    }
+    return alerts;
+}
+app.get('/api/flood-alerts', async (req, res) => {
+    const basinId = String(req.query.basinId || 'babahoyo').toLowerCase();
+    if (!BASINS[basinId]) return res.status(400).json({ available: false, error: 'Invalid basin ID', alerts: [] });
+    try {
+        const response = await fetch('https://cap-sources.s3.amazonaws.com/ec-inamhi-es/rss.xml', {
+            headers: { 'Accept': 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8', 'User-Agent': 'HydroVision-Flood-Alert-Monitor/1.0' },
+            signal: AbortSignal.timeout(10000)
+        });
+        if (!response.ok) throw new Error('Official CAP feed returned HTTP ' + response.status);
+        const xml = await response.text();
+        const alerts = hvParseCapFeed(xml, basinId);
+        res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=300');
+        res.json({
+            available: true,
+            basinId,
+            checkedAt: new Date().toISOString(),
+            alerts,
+            count: alerts.length,
+            source: 'INAMHI Common Alerting Protocol (CAP) feed',
+            sourceUrl: 'https://servicios.inamhi.gob.ec/alertas/'
+        });
+    } catch (error) {
+        console.error('Flood alert feed error:', error.message);
+        res.status(503).json({
+            available: false,
+            basinId,
+            checkedAt: new Date().toISOString(),
+            alerts: [],
+            error: 'Official alert feed is temporarily unavailable.',
+            sourceUrl: 'https://servicios.inamhi.gob.ec/alertas/'
+        });
+    }
+});
+
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found', path: req.path });
 });
