@@ -2461,7 +2461,12 @@ recommendationsToShow.forEach(item => {
   };
 
   let map, riverLayer, basinLayer, polygonData, riverData;
-  let selectedBasin = "babahoyo";
+  let selectedBasin = (function () {
+    try {
+      const saved = localStorage.getItem("hydrovision-basin");
+      return ["babahoyo", "lower_guayas", "daule", "vinces"].includes(saved) ? saved : "babahoyo";
+    } catch (e) { return "babahoyo"; }
+  })();
   let mapReady = false;
 
   function normalizeBasin(value) {
@@ -2647,8 +2652,10 @@ recommendationsToShow.forEach(item => {
 
   window.hydroVisionUpdateBasinMap = function (basin) {
     selectedBasin = normalizeBasin(basin);
-    if (mapReady) drawBasin(selectedBasin);
-    else updateStory(selectedBasin);
+    if (mapReady) {
+      map.invalidateSize(true);
+      drawBasin(selectedBasin);
+    } else updateStory(selectedBasin);
   };
 })();
 </script>
@@ -3683,6 +3690,10 @@ if(page==="assistant"){const article=document.querySelector('[data-hv-page-item=
 document.documentElement.dataset.hvPage=page;
 document.querySelectorAll(".hv-side-link[data-hv-page]").forEach(a=>a.classList.toggle("active",a.dataset.hvPage===page));
 applyLanguage();
+if (page === "government" && typeof window.fetchGov === "function") window.fetchGov();
+if (page === "map" && typeof window.hydroVisionUpdateBasinMap === "function") {
+ requestAnimationFrame(() => window.hydroVisionUpdateBasinMap((() => { try { return localStorage.getItem("hydrovision-basin") || "babahoyo"; } catch(e) { return "babahoyo"; } })()));
+}
 const old=window.toggleLanguage;if(typeof old==="function")window.toggleLanguage=function(){const v=old.apply(this,arguments);applyLanguage();return v;};
 })();
 </script>
