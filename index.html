@@ -1459,6 +1459,69 @@ textarea:focus-visible {
 </style>
 <!-- /HV_THEME_POLISH_V1 -->
 
+
+<!-- HV_RIVER_TIME_STORIES_V1 -->
+<style id="hv-river-stories-style">
+#hv-river-stories{margin:28px 0;color:var(--hv-text,#f8fafc)}
+.hv-rs-shell{border:1px solid rgba(213,164,93,.3);border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(18,39,38,.97),rgba(22,34,31,.98));box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.hv-rs-head{padding:24px 26px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;border-bottom:1px solid rgba(213,164,93,.18)}
+.hv-rs-kicker{font-size:10px;letter-spacing:2px;font-weight:900;color:#e4b86b}
+.hv-rs-head h2{font-size:clamp(21px,3vw,30px);font-weight:900;color:#fff5df;margin-top:7px}
+.hv-rs-head p{color:#c9d4c8;font-size:13px;line-height:1.8;max-width:760px;margin-top:5px}
+.hv-rs-chapters{display:flex;gap:8px;flex-wrap:wrap;padding:15px 22px;border-bottom:1px solid rgba(213,164,93,.15)}
+.hv-rs-chapter{border:1px solid rgba(226,232,240,.18);border-radius:999px;padding:9px 14px;color:#e8eee7;background:rgba(255,255,255,.045);font:700 12px Cairo,sans-serif;cursor:pointer}
+.hv-rs-chapter[aria-pressed="true"]{background:linear-gradient(120deg,#9d4e31,#c18a43);border-color:#e8bf70;color:white;box-shadow:0 5px 18px rgba(160,89,44,.25)}
+.hv-rs-body{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,.8fr);gap:18px;padding:20px}
+.hv-rs-screen{position:relative;min-height:340px;overflow:hidden;border-radius:18px;background:#102d35;border:1px solid rgba(255,255,255,.14);isolation:isolate}
+.hv-rs-screen:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 110%,rgba(38,151,143,.48),transparent 48%),linear-gradient(180deg,#183d4b 0%,#315d61 52%,#d2a66c 100%);transition:filter .6s}
+.hv-rs-screen[data-scene="1"]:before{filter:hue-rotate(12deg)}
+.hv-rs-screen[data-scene="2"]:before{filter:hue-rotate(-12deg) brightness(.9)}
+.hv-rs-screen[data-scene="3"]:before{filter:hue-rotate(24deg) saturate(1.2)}
+.hv-rs-screen[data-scene="4"]:before{filter:hue-rotate(-24deg) brightness(1.08)}
+.hv-rs-art{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hv-rs-river{fill:none;stroke:#78e2d2;stroke-width:8;stroke-linecap:round;stroke-dasharray:13 10;animation:hvRsFlow 3.2s linear infinite;filter:drop-shadow(0 0 8px rgba(120,226,210,.6))}
+.hv-rs-river-thin{fill:none;stroke:rgba(190,250,232,.78);stroke-width:3;stroke-dasharray:5 10;animation:hvRsFlow 5s linear infinite}
+.hv-rs-mountain{fill:#1c3b39;opacity:.92}
+.hv-rs-mountain-back{fill:#52746a;opacity:.65}
+.hv-rs-land{fill:#a17d50;opacity:.72}
+.hv-rs-cloud{fill:rgba(238,245,231,.18);animation:hvRsCloud 22s ease-in-out infinite alternate}
+.hv-rs-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0,transparent 5px,rgba(255,255,255,.018) 6px);z-index:1}
+.hv-rs-screen-copy{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:30px 26px 24px;background:linear-gradient(180deg,transparent,rgba(5,17,19,.92) 35%)}
+.hv-rs-counter{font-size:10px;letter-spacing:2px;font-weight:900;color:#f2c779}
+.hv-rs-screen-copy h3{font-size:clamp(20px,3vw,29px);line-height:1.35;color:#fff8e9;font-weight:900;margin:8px 0}
+.hv-rs-screen-copy p{font-size:13px;line-height:1.9;color:#e1e9df;max-width:850px}
+@keyframes hvRsFlow{to{stroke-dashoffset:-92}}
+@keyframes hvRsCloud{to{transform:translateX(38px)}}
+.hv-rs-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px}
+.hv-rs-control-group{display:flex;gap:8px;flex-wrap:wrap}
+.hv-rs-btn{border:1px solid rgba(213,164,93,.35);background:rgba(31,57,49,.88);color:#fff4dc;border-radius:11px;padding:10px 14px;font:800 12px Cairo,sans-serif;cursor:pointer}
+.hv-rs-btn.primary{background:linear-gradient(120deg,#9c4d30,#c18b43);border-color:#e4bd73}
+.hv-rs-btn:disabled{opacity:.45;cursor:not-allowed}
+.hv-rs-progress{height:5px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:14px}
+.hv-rs-progress span{display:block;height:100%;width:20%;background:linear-gradient(90deg,#43c7bd,#e8b84d);transition:width .35s ease}
+.hv-rs-side{border:1px solid rgba(213,164,93,.2);border-radius:17px;background:rgba(255,255,255,.035);padding:17px;min-width:0}
+.hv-rs-side h3{font-size:14px;font-weight:900;color:#f5d79c;margin-bottom:12px}
+.hv-rs-timeline{display:grid;gap:8px}
+.hv-rs-step{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:start;border:1px solid transparent;border-radius:12px;padding:10px;background:rgba(255,255,255,.035);color:#dce6dc;cursor:pointer;font:600 12px/1.6 Cairo,sans-serif}
+.hv-rs-step b{display:grid;place-items:center;flex:0 0 25px;height:25px;border-radius:50%;background:rgba(213,164,93,.16);color:#f2c779;font-size:11px}
+.hv-rs-step[aria-current="step"]{background:rgba(47,126,111,.22);border-color:rgba(104,210,188,.38);color:#fff}
+.hv-rs-source{font-size:11px;line-height:1.8;color:#b7c6b9;margin-top:15px;padding-top:13px;border-top:1px solid rgba(255,255,255,.1)}
+.hv-rs-source a{color:#8fe3d2;text-decoration:underline;text-underline-offset:3px}
+.hv-rs-note{font-size:10px;line-height:1.7;color:#9fb2a5;margin-top:9px}
+html[data-hv-theme="light"] .hv-rs-shell{background:linear-gradient(145deg,#fffaf0,#e8eee2);border-color:rgba(147,112,65,.32)}
+html[data-hv-theme="light"] .hv-rs-head h2{color:#294638}
+html[data-hv-theme="light"] .hv-rs-head p,html[data-hv-theme="light"] .hv-rs-source,html[data-hv-theme="light"] .hv-rs-note{color:#5d6b5e}
+html[data-hv-theme="light"] .hv-rs-chapter{color:#344b3c;background:rgba(75,104,78,.08);border-color:rgba(75,104,78,.2)}
+html[data-hv-theme="light"] .hv-rs-chapter[aria-pressed="true"]{color:#fff}
+html[data-hv-theme="light"] .hv-rs-side{background:rgba(255,255,255,.65);border-color:rgba(147,112,65,.2)}
+html[data-hv-theme="light"] .hv-rs-side h3{color:#72502a}
+html[data-hv-theme="light"] .hv-rs-step{color:#354b3d;background:rgba(70,100,70,.07)}
+html[data-hv-theme="light"] .hv-rs-step[aria-current="step"]{background:rgba(47,126,111,.14);color:#213f34}
+html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
+@media(max-width:850px){.hv-rs-body{grid-template-columns:1fr}.hv-rs-screen{min-height:310px}}
+@media(max-width:520px){.hv-rs-head{padding:19px}.hv-rs-body{padding:12px}.hv-rs-screen{min-height:340px}.hv-rs-screen-copy{padding:22px 17px}.hv-rs-chapters{padding:12px}.hv-rs-chapter{font-size:11px;padding:8px 11px}}
+@media(prefers-reduced-motion:reduce){.hv-rs-river,.hv-rs-river-thin,.hv-rs-cloud{animation:none!important}}
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
 <div id="nasa-top-logo">
@@ -1694,6 +1757,72 @@ textarea:focus-visible {
                 </div>
             </div>
         
+
+<section id="hv-river-stories" dir="auto" aria-label="Interactive river history">
+ <div class="hv-rs-shell">
+  <header class="hv-rs-head">
+   <div>
+    <div class="hv-rs-kicker" id="hv-rs-kicker">RIVER HISTORY • INTERACTIVE DOCUMENTARY</div>
+    <h2 id="hv-rs-title">From the Andes to the Gulf: The Guayas River Story</h2>
+    <p id="hv-rs-intro">Explore the geological landscape, connected tributaries and the river communities through five narrated visual chapters.</p>
+   </div>
+   <div style="font-size:12px;color:#e8bf70;font-weight:800" id="hv-rs-mode">✦ 5 connected river stories</div>
+  </header>
+  <nav class="hv-rs-chapters" aria-label="Choose a river story">
+   <button class="hv-rs-chapter" type="button" data-rs-chapter="guayas" aria-pressed="true">🌎 Guayas River</button>
+   <button class="hv-rs-chapter" type="button" data-rs-chapter="babahoyo" aria-pressed="false">🌿 Babahoyo</button>
+   <button class="hv-rs-chapter" type="button" data-rs-chapter="lower_guayas" aria-pressed="false">🌊 Lower Guayas</button>
+   <button class="hv-rs-chapter" type="button" data-rs-chapter="daule" aria-pressed="false">🏞️ Daule</button>
+   <button class="hv-rs-chapter" type="button" data-rs-chapter="vinces" aria-pressed="false">💧 Vinces</button>
+  </nav>
+  <div class="hv-rs-body">
+   <div>
+    <div class="hv-rs-screen" id="hv-rs-screen" data-scene="0">
+     <svg class="hv-rs-art" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Animated illustration of mountains, river tributaries and a coastal plain">
+      <circle cx="730" cy="75" r="43" fill="#f2ca7d" opacity=".85"/>
+      <path class="hv-rs-cloud" d="M80 95c8-24 38-28 55-9 17-23 55-13 58 13 24 2 29 34 5 41H91c-28-3-31-34-11-45z"/>
+      <path class="hv-rs-cloud" d="M600 140c10-21 34-23 49-7 14-18 43-11 47 12 22 2 24 27 3 34h-91c-24-3-27-28-8-39z"/>
+      <path class="hv-rs-mountain-back" d="M0 260 105 120 185 222 286 80 405 248 520 132 655 270 760 155 900 280V420H0Z"/>
+      <path class="hv-rs-mountain" d="M0 300 118 184 205 280 310 145 430 302 550 205 670 310 780 215 900 320V420H0Z"/>
+      <path class="hv-rs-land" d="M0 310Q180 285 330 320T650 315T900 330V420H0Z"/>
+      <path class="hv-rs-river-thin" d="M115 205Q210 260 285 290T430 330"/>
+      <path class="hv-rs-river-thin" d="M310 170Q350 250 450 300T590 330"/>
+      <path class="hv-rs-river-thin" d="M520 215Q550 265 610 300T720 340"/>
+      <path class="hv-rs-river" d="M430 285Q470 310 520 320T650 345Q740 365 900 390"/>
+      <path class="hv-rs-river" d="M100 215Q180 265 260 295T430 330"/>
+      <path class="hv-rs-river" d="M290 165Q335 250 430 300T610 340"/>
+     </svg>
+     <div class="hv-rs-scan"></div>
+     <div class="hv-rs-screen-copy">
+      <div class="hv-rs-counter" id="hv-rs-counter">CHAPTER 01 / 05</div>
+      <h3 id="hv-rs-scene-title">A landscape shaped by deep time</h3>
+      <p id="hv-rs-scene-text">The Guayas basin is a landscape built by uplift, flowing water and layers of river sediment.</p>
+     </div>
+    </div>
+    <div class="hv-rs-progress" aria-label="Story progress"><span id="hv-rs-progress-fill"></span></div>
+    <div class="hv-rs-controls">
+     <div class="hv-rs-control-group">
+      <button class="hv-rs-btn" id="hv-rs-prev" type="button">← Previous</button>
+      <button class="hv-rs-btn primary" id="hv-rs-next" type="button">Next chapter →</button>
+     </div>
+     <div class="hv-rs-control-group">
+      <button class="hv-rs-btn primary" id="hv-rs-voice" type="button">🔊 Narrate this scene</button>
+      <button class="hv-rs-btn" id="hv-rs-stop" type="button">■ Stop voice</button>
+     </div>
+    </div>
+   </div>
+   <aside class="hv-rs-side">
+    <h3 id="hv-rs-timeline-title">The story timeline</h3>
+    <div class="hv-rs-timeline" id="hv-rs-timeline"></div>
+    <div class="hv-rs-source" id="hv-rs-source">
+     Scientific basis: <a href="https://www.inamhi.gob.ec/Publicaciones/Hidrologia/HIDROGEOLOGIA_2%20EDICION_2014.pdf" target="_blank" rel="noopener noreferrer">INAMHI geological and hydrological overview</a> ·
+     <a href="https://hess.copernicus.org/articles/23/2763/2019/" target="_blank" rel="noopener noreferrer">Guayas sediment study</a>.
+    </div>
+    <p class="hv-rs-note" id="hv-rs-note">Visuals are explanatory illustrations, not historical satellite footage. Narration uses the browser's built-in text-to-speech voice.</p>
+   </aside>
+  </div>
+ </div>
+</section>
 <!-- HV_EVIDENCE_FEATURES_V1 -->
 <section id="hv-evidence-section" class="space-y-5" dir="auto">
 
@@ -3299,6 +3428,111 @@ recommendationsToShow.forEach(item => {
 })();
 </script>
 
+
+<script id="hv-river-stories-script">
+(function(){
+ "use strict";
+ var root=document.getElementById("hv-river-stories");
+ if(!root)return;
+ var chapters={
+  guayas:[
+   {ar:["أرض صاغها الزمن الجيولوجي","تكوّن حوض غواياس عبر تاريخ جيولوجي طويل. ساهم رفع السلاسل الساحلية وتراكم الرواسب النهرية ورواسب سفوح الجبال في تشكيل السهول والمنصات الرسوبية الواسعة."],en:["A landscape shaped by deep time","The Guayas basin has a long geological history. Uplift of coastal ranges and the accumulation of river and piedmont sediments helped shape its broad depositional plains."],es:["Un paisaje moldeado por el tiempo geológico","La cuenca del Guayas tiene una larga historia geológica. El levantamiento de las cordilleras costeras y la acumulación de sedimentos fluviales contribuyeron a formar sus amplias llanuras."]},
+   {ar:["المياه تبدأ رحلتها من المرتفعات","تجمع الأنهار والروافد مياه الأمطار من سفوح الأنديز والمناطق المرتفعة غرب الإكوادور، ثم تنقلها تدريجيًا نحو الأراضي المنخفضة."],en:["Water begins in the uplands","Rivers and tributaries collect rainfall from the Andean foothills and the western Ecuadorian highlands, carrying it gradually toward the lowlands."],es:["El agua comienza en las tierras altas","Los ríos y afluentes recogen la lluvia de las estribaciones andinas y la conducen gradualmente hacia las tierras bajas."]},
+   {ar:["رافدان يلتقيان","يتحد نهرا Daule وBabahoyo قرب Guayaquil ليشكّلا نهر Guayas. هذا الالتقاء هو القلب الهيدرولوجي للنظام النهري."],en:["Two great rivers meet","The Daule and Babahoyo rivers converge near Guayaquil to form the Guayas River. Their meeting is the central junction of this river system."],es:["Dos grandes ríos se encuentran","Los ríos Daule y Babahoyo confluyen cerca de Guayaquil y forman el río Guayas. Su unión es el eje de este sistema fluvial."]},
+   {ar:["سهول رسوبية واسعة","تُظهر المنطقة تضاريس منخفضة الانحدار وسهولًا تشكلت من تراكم الرواسب عبر الزمن. وتؤثر هذه الطبيعة في حركة المياه وانتشارها خلال مواسم الأمطار."],en:["A broad alluvial plain","Much of the basin has gentle relief and plains shaped by sediment deposited over time. This landscape influences how water moves and spreads during rainy periods."],es:["Una extensa llanura aluvial","Gran parte de la cuenca tiene un relieve suave y llanuras formadas por sedimentos. Esta configuración influye en el movimiento y la expansión del agua durante las lluvias."]},
+   {ar:["الرحلة نحو خليج غواياكيل","يتصل نهر Guayas بمنظومة مصبية تتأثر بالمياه العذبة والمد والجزر، قبل أن تنفتح على خليج Guayaquil والمحيط الهادئ."],en:["The journey toward the Gulf","The Guayas connects to an estuarine system influenced by freshwater and tides before opening into the Gulf of Guayaquil and the Pacific."],es:["El camino hacia el golfo","El Guayas se conecta con un sistema estuarino influido por el agua dulce y las mareas antes de abrirse al golfo de Guayaquil y al Pacífico."]}
+  ],
+  babahoyo:[
+   {ar:["الفرع الشرقي للحوض","يشكل Babahoyo أحد النظامين النهريين الرئيسيين في حوض Guayas، ويمتد عبر السهول الشرقية للحوض."],en:["The eastern river system","Babahoyo is one of the two major river systems in the Guayas basin, draining the eastern side of the basin."],es:["El sistema fluvial oriental","Babahoyo es uno de los dos sistemas fluviales principales de la cuenca del Guayas y drena su sector oriental."]},
+   {ar:["روافد تصنع شبكة مترابطة","تغذيه أنهار وروافد مهمة، من بينها Vinces وQuevedo وMilagro وCatarama، لتكوّن شبكة تصريف مترابطة."],en:["Tributaries form a connected network","Important tributaries include Vinces, Quevedo, Milagro and Catarama, creating a connected drainage network."],es:["Los afluentes forman una red conectada","Entre sus afluentes importantes están Vinces, Quevedo, Milagro y Catarama, que forman una red de drenaje conectada."]},
+   {ar:["الأمطار القادمة من المرتفعات","تسهم الأمطار والجريان السطحي من سفوح الأنديز الغربية في تغذية روافد النظام، ثم تنتقل المياه نحو الأراضي المنخفضة."],en:["Rainfall from the highlands","Rainfall and runoff from the western Andean foothills feed the river network, carrying water toward the lower plains."],es:["Lluvia desde las tierras altas","La lluvia y la escorrentía de las estribaciones occidentales de los Andes alimentan la red y llevan agua hacia las llanuras bajas."]},
+   {ar:["سهول ومجتمعات تعتمد على النهر","ترتبط السهول المحيطة بالنهر بالزراعة والاستيطان والنقل المحلي. وتصبح متابعة تغيرات المياه مهمة خلال المواسم المطيرة."],en:["A river beside working landscapes","The surrounding plains support agriculture, settlements and local transport. Tracking water changes is especially important during rainy seasons."],es:["Un río junto a paisajes productivos","Las llanuras cercanas sostienen la agricultura, los asentamientos y el transporte local. Observar los cambios del agua es importante durante la temporada lluviosa."]},
+   {ar:["الالتقاء بنهر Daule","يتجه Babahoyo جنوبًا ليلتقي بنهر Daule قرب Guayaquil، ومن اتحادهما يبدأ مجرى Guayas."],en:["Meeting the Daule","Babahoyo flows south to meet the Daule near Guayaquil. Their confluence forms the Guayas River."],es:["El encuentro con el Daule","Babahoyo fluye hacia el sur y se une al Daule cerca de Guayaquil. Su confluencia forma el río Guayas."]}
+  ],
+  lower_guayas:[
+   {ar:["المجرى downstream نحو الساحل","يمثل Lower Guayas الجزء المنخفض والسفلي من النظام، حيث تتجمع مياه الأحواض الأعلى قبل وصولها إلى منطقة Guayaquil."],en:["The downstream lowlands","Lower Guayas represents the low-lying downstream part of the system, receiving drainage from upstream areas toward Guayaquil."],es:["Las tierras bajas aguas abajo","Lower Guayas representa el sector bajo del sistema y recibe el drenaje de las zonas aguas arriba en dirección a Guayaquil."]},
+   {ar:["أرض صنعتها الرواسب","تراكمت الرواسب النهرية عبر فترات طويلة لتشكّل سهولًا طينية ورسوبية واسعة ومنخفضة الانحدار."],en:["A plain built by sediment","River sediments accumulated over long periods, helping create broad, low-gradient alluvial plains."],es:["Una llanura construida por sedimentos","Los sedimentos fluviales se acumularon durante largos períodos y ayudaron a formar amplias llanuras aluviales de poca pendiente."]},
+   {ar:["كل الروافد تترك أثرها","تؤثر المياه القادمة من Daule وBabahoyo والروافد المتصلة بهما في ظروف المجرى السفلي؛ لذلك لا يمكن فهمه بمعزل عن الأحواض الأعلى."],en:["Upstream rivers shape the lower basin","Water arriving from the Daule, Babahoyo and their connected tributaries influences downstream conditions. The lower basin cannot be understood in isolation."],es:["Los ríos de aguas arriba influyen","El agua del Daule, Babahoyo y sus afluentes influye en las condiciones aguas abajo. La cuenca baja no puede entenderse de forma aislada."]},
+   {ar:["تأثير المد والجزر","قرب Guayaquil، تتداخل حركة مياه النهر مع تأثير المد والجزر في المنظومة المصبية، فتتغير حركة المياه بحسب الظروف النهرية والبحرية."],en:["The influence of tides","Near Guayaquil, river flow interacts with tidal motion in the estuary. Water movement reflects both river conditions and coastal processes."],es:["La influencia de las mareas","Cerca de Guayaquil, el flujo del río interactúa con las mareas del estuario. El movimiento del agua refleja procesos fluviales y costeros."]},
+   {ar:["لماذا تهم مراقبة السهول؟","الانحدار المنخفض واتصال المجاري يجعل متابعة الأمطار والمياه والرصد الفضائي مفيدة لفهم مناطق تجمع المياه المحتملة، دون اعتبارها إنذارًا رسميًا."],en:["Why monitor the plains?","Low gradients and connected channels make rainfall, water observations and satellite monitoring useful for understanding places where water may accumulate—not as an official warning."],es:["¿Por qué vigilar las llanuras?","La baja pendiente y los canales conectados hacen útil observar la lluvia y el agua mediante satélites para estudiar posibles acumulaciones, no como alerta oficial."]}
+  ],
+  daule:[
+   {ar:["النظام الغربي لحوض غواياس","يمتد نهر Daule عبر القطاع الغربي من حوض Guayas، ويجمع المياه من شبكة واسعة من الروافد."],en:["The western Guayas river system","The Daule River runs through the western part of the Guayas basin and gathers water from a wide network of tributaries."],es:["El sistema occidental del Guayas","El río Daule recorre el sector occidental de la cuenca del Guayas y recoge agua de una amplia red de afluentes."]},
+   {ar:["من سفوح المرتفعات","تبدأ شبكة Daule في المناطق الشمالية والمرتفعة من غرب الإكوادور، حيث تسهم الأمطار والجريان السطحي في تغذية المجاري."],en:["From the western uplands","The Daule network begins in the northern and higher parts of western Ecuador, where rainfall and runoff feed its channels."],es:["Desde las tierras altas occidentales","La red del Daule nace en zonas septentrionales y elevadas del oeste de Ecuador, donde la lluvia alimenta sus cauces."]},
+   {ar:["روافد تغذي المجرى","من روافده Macul وPeripa وPescadillo وCajones وLa Esperanza، وهي تتصل بالمجرى الرئيسي وتزيد ترابط الشبكة."],en:["Tributaries feed the main channel","Its tributaries include Macul, Peripa, Pescadillo, Cajones and La Esperanza, linking surrounding catchments to the main river."],es:["Los afluentes alimentan el cauce","Entre sus afluentes están Macul, Peripa, Pescadillo, Cajones y La Esperanza, que conectan las cuencas vecinas con el río principal."]},
+   {ar:["الرحلة جنوبًا","يتجه Daule جنوبًا عبر الأراضي المنخفضة، وتحيط به مناطق زراعية ومجتمعات تعتمد على المياه والطرق المرتبطة بالنهر."],en:["A journey south","Daule flows south through lower terrain, alongside agricultural areas and communities connected to the river and its crossings."],es:["Un recorrido hacia el sur","El Daule fluye hacia el sur por terrenos bajos, junto a zonas agrícolas y comunidades conectadas con el río y sus cruces."]},
+   {ar:["الالتقاء الذي يصنع Guayas","قرب Guayaquil يلتقي Daule بنهر Babahoyo. ومن هذه النقطة يتكون نهر Guayas متجهًا نحو الخليج."],en:["The confluence that forms Guayas","Near Guayaquil, the Daule meets the Babahoyo. From this confluence, the Guayas continues toward the gulf."],es:["La confluencia que forma el Guayas","Cerca de Guayaquil, el Daule se une al Babahoyo. Desde esa confluencia, el Guayas continúa hacia el golfo."]}
+  ],
+  vinces:[
+   {ar:["فرع مهم في شبكة Babahoyo","يُعد نهر Vinces أحد الروافد الرئيسية المرتبطة بنظام Babahoyo، ويساهم في تصريف المياه من القطاع الأوسط للحوض."],en:["A major branch of the Babahoyo network","The Vinces is an important tributary within the Babahoyo river system, draining part of the central basin."],es:["Una rama importante del sistema Babahoyo","El Vinces es un afluente importante del sistema fluvial Babahoyo y drena parte del sector central de la cuenca."]},
+   {ar:["مياه من الشمال والمرتفعات","تغذي الأمطار والجداول القادمة من المناطق الشمالية وسفوح المرتفعات شبكة النهر، قبل أن تتجه المياه نحو السهول."],en:["Water from northern uplands","Rainfall and streams from northern areas and nearby uplands feed the river network before it reaches the plains."],es:["Agua desde las tierras altas del norte","La lluvia y los cursos de agua de las zonas septentrionales alimentan la red antes de que llegue a las llanuras."]},
+   {ar:["روافد وقنوات مترابطة","يتصل Vinces بمجموعة من الروافد والمجاري الفرعية، وتظهر في المنطقة روابط مائية بين أنظمة Daule وBabahoyo."],en:["Connected tributaries and channels","Vinces links with tributaries and smaller channels; the wider lowland network includes connections between the Daule and Babahoyo systems."],es:["Afluentes y canales conectados","Vinces se conecta con afluentes y canales menores; la red de tierras bajas incluye conexiones entre los sistemas Daule y Babahoyo."]},
+   {ar:["النهر والأراضي الزراعية","تُستخدم مياه النظام النهري في دعم الأنشطة الزراعية والري في المنطقة، ما يجعل انتظام المياه وجودتها مهمين للمجتمعات."],en:["A river beside agricultural land","The river system supports agricultural activity and irrigation in the region, making water availability and quality important to local communities."],es:["El río y las tierras agrícolas","El sistema fluvial apoya la actividad agrícola y el riego de la región, por lo que la disponibilidad y calidad del agua son importantes."]},
+   {ar:["جزء من قصة أكبر","تواصل مياه Vinces رحلتها ضمن شبكة Babahoyo ثم نظام Guayas الأوسع؛ فكل حوض فرعي جزء من منظومة مترابطة."],en:["Part of a larger story","Vinces waters continue through the Babahoyo network and the wider Guayas system. Each sub-basin is one part of a connected whole."],es:["Parte de una historia mayor","Las aguas del Vinces continúan por la red Babahoyo y el sistema Guayas. Cada subcuenca forma parte de un conjunto conectado."]}
+  ]
+ };
+ var labels={
+  ar:{title:"من الأنديز إلى الخليج: حكاية نهر غواياس",intro:"رحلة وثائقية تفاعلية عبر التاريخ الجيولوجي، والروافد المتصلة، والسهول والمجتمعات النهرية.",chapters:["نهر غواياس","حوض باباهويو","غواياس السفلي","حوض داولي","حوض فينسيس"],timeline:"خط زمني للقصة",prev:"→ السابق",next:"الفصل التالي ←",voice:"🔊 استمع إلى السرد",stop:"■ إيقاف الصوت",chapter:"الفصل",scene:"المشهد",note:"المشاهد رسوم توضيحية وليست لقطات أقمار صناعية تاريخية. السرد الصوتي يستخدم ميزة تحويل النص إلى كلام المتاحة في المتصفح.",source:"الأساس العلمي: تقرير INAMHI الجيولوجي والهيدرولوجي · دراسة رواسب نهر Guayas."},
+  en:{title:"From the Andes to the Gulf: The Guayas River Story",intro:"An interactive documentary journey through geological history, connected tributaries, floodplains and river communities.",chapters:["Guayas River","Babahoyo Basin","Lower Guayas","Daule Basin","Vinces Basin"],timeline:"Story timeline",prev:"← Previous",next:"Next chapter →",voice:"🔊 Narrate this scene",stop:"■ Stop voice",chapter:"CHAPTER",scene:"SCENE",note:"Scenes are explanatory illustrations, not historical satellite footage. Narration uses the browser's built-in text-to-speech voice.",source:"Scientific basis: INAMHI geological and hydrological overview · Guayas River sediment study."},
+  es:{title:"De los Andes al golfo: La historia del río Guayas",intro:"Un recorrido documental interactivo por la historia geológica, los afluentes, las llanuras y las comunidades ribereñas.",chapters:["Río Guayas","Cuenca Babahoyo","Guayas inferior","Cuenca Daule","Cuenca Vinces"],timeline:"Línea de tiempo",prev:"← Anterior",next:"Siguiente capítulo →",voice:"🔊 Escuchar narración",stop:"■ Detener voz",chapter:"CAPÍTULO",scene:"ESCENA",note:"Las escenas son ilustraciones explicativas, no imágenes satelitales históricas. La narración utiliza la función de voz del navegador.",source:"Base científica: panorama geológico e hidrológico de INAMHI · estudio de sedimentos del río Guayas."}
+ };
+ var ids=["guayas","babahoyo","lower_guayas","daule","vinces"], current="guayas", step=0;
+ function lang(){return (typeof currentLang!=="undefined"&&labels[currentLang])?currentLang:"ar";}
+ function words(){return labels[lang()];}
+ function sceneText(item){return item[lang()]||item.en;}
+ function render(){
+  var story=chapters[current], s=story[step], w=words(), pair=sceneText(s);
+  document.getElementById("hv-rs-title").textContent=w.title;
+  document.getElementById("hv-rs-intro").textContent=w.intro;
+  document.getElementById("hv-rs-timeline-title").textContent=w.timeline;
+  document.getElementById("hv-rs-prev").textContent=w.prev;
+  document.getElementById("hv-rs-next").textContent=w.next;
+  document.getElementById("hv-rs-voice").textContent=w.voice;
+  document.getElementById("hv-rs-stop").textContent=w.stop;
+  document.getElementById("hv-rs-note").textContent=w.note;
+  document.getElementById("hv-rs-source").innerHTML=w.source+ ' <a href="https://www.inamhi.gob.ec/Publicaciones/Hidrologia/HIDROGEOLOGIA_2%20EDICION_2014.pdf" target="_blank" rel="noopener noreferrer">INAMHI</a> · <a href="https://hess.copernicus.org/articles/23/2763/2019/" target="_blank" rel="noopener noreferrer">HESS</a>';
+  document.getElementById("hv-rs-counter").textContent=w.chapter+" "+String(step+1).padStart(2,"0")+" / 05";
+  document.getElementById("hv-rs-scene-title").textContent=pair[0];
+  document.getElementById("hv-rs-scene-text").textContent=pair[1];
+  document.getElementById("hv-rs-screen").setAttribute("data-scene",String(step));
+  document.getElementById("hv-rs-progress-fill").style.width=((step+1)/story.length*100)+"%";
+  document.getElementById("hv-rs-prev").disabled=step===0;
+  document.getElementById("hv-rs-next").disabled=step===story.length-1;
+  document.querySelectorAll("[data-rs-chapter]").forEach(function(btn){btn.setAttribute("aria-pressed",String(btn.dataset.rsChapter===current));});
+  var timeline=document.getElementById("hv-rs-timeline"); timeline.innerHTML="";
+  story.forEach(function(item,i){
+   var b=document.createElement("button");b.type="button";b.className="hv-rs-step";b.setAttribute("aria-current",i===step?"step":"false");
+   var n=document.createElement("b");n.textContent=String(i+1).padStart(2,"0");
+   var t=document.createElement("span");t.textContent=sceneText(item)[0];
+   b.appendChild(n);b.appendChild(t);b.addEventListener("click",function(){stopVoice();step=i;render();});timeline.appendChild(b);
+  });
+  document.querySelectorAll("[data-rs-chapter]").forEach(function(btn){
+   var ix=ids.indexOf(btn.dataset.rsChapter);btn.textContent=["🌎 ","🌿 ","🌊 ","🏞️ ","💧 "][ix]+w.chapters[ix];
+  });
+ }
+ function stopVoice(){if("speechSynthesis" in window)window.speechSynthesis.cancel();}
+ function speak(){
+  if(!("speechSynthesis" in window)){alert(lang()==="ar"?"ميزة الصوت غير مدعومة في هذا المتصفح.":"Speech synthesis is not supported in this browser.");return;}
+  stopVoice();var pair=sceneText(chapters[current][step]);var u=new SpeechSynthesisUtterance(pair[0]+". "+pair[1]);
+  u.lang=lang()==="ar"?"ar-EG":lang()==="es"?"es-ES":"en-US";u.rate=.92;window.speechSynthesis.speak(u);
+ }
+ function choose(id){if(!chapters[id])return;stopVoice();current=id;step=0;render();}
+ document.querySelectorAll("[data-rs-chapter]").forEach(function(btn){btn.addEventListener("click",function(){choose(btn.dataset.rsChapter);});});
+ document.getElementById("hv-rs-prev").addEventListener("click",function(){if(step>0){stopVoice();step--;render();}});
+ document.getElementById("hv-rs-next").addEventListener("click",function(){if(step<4){stopVoice();step++;render();}});
+ document.getElementById("hv-rs-voice").addEventListener("click",speak);
+ document.getElementById("hv-rs-stop").addEventListener("click",stopVoice);
+ if(typeof window.setBasin==="function"){
+  var original=window.setBasin;
+  window.setBasin=function(id){var result=original.apply(this,arguments);choose(id);return result;};
+ }
+ if(typeof window.toggleLanguage==="function"){
+  var oldToggle=window.toggleLanguage;
+  window.toggleLanguage=function(){var result=oldToggle.apply(this,arguments);render();return result;};
+ }
+ render();
+})();
+</script>
 </body>
 </html>
 
