@@ -423,7 +423,7 @@ app.get('/data/reference/hydrorivers/guayas_rivers.geojson', (req, res) => {
 
 
 // HYDROVISION_ASSISTANT_API_V2
-app.post('/api/assistant', (req, res) => {
+app.post('/api/assistant', async (req, res) => {
     try {
         const body = req.body || {};
         const question = String(body.question || '').trim().slice(0, 1000);
@@ -683,14 +683,94 @@ app.post('/api/assistant', (req, res) => {
 
         if (!rows.length) add(text.noData);
 
+        const localAnswer = output.join('\n\n');
+        let finalAnswer = localAnswer;
+        let answerSource = 'local-project-data-intent-engine';
+        let generatedByAI = false;
+
+        // Optional grounded Gemini layer. The local engine remains the fallback.
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (apiKey) {
+            try {
+                const seasonalPath = path.join(__dirname, 'data', 'reference', 'seasonal_recommendations', 'pkg', 'guayas_seasonal_recommendations.md');
+                let seasonalNotes = '';
+                try { seasonalNotes = fs.readFileSync(seasonalPath, 'utf8').slice(0, 14000); } catch (_) {}
+
+                const projectContext = {
+                    project: 'HydroVision: AI-powered flood intelligence for Ecuador’s Guayas River Basin',
+                    subBasins: ['Babahoyo', 'Lower Guayas', 'Daule', 'Vinces'],
+                    selectedBasin: basinId,
+                    language: lang,
+                    nasaAnalysis: rows,
+                    riverNetwork: riverData,
+                    seasonalGuidance: seasonalNotes,
+                    localAnswer,
+                    criticalLimitations: [
+                        'NISAR event observation is dated 2026-10-31 and is compared with a baseline window 2026-06-01 to 2026-10-15.',
+                        'Classified area and vegetation proxy are provisional remote-sensing indicators, not verified flood extent, damage, or statistical flood probability.',
+                        'Do not claim that the single satellite observation predicts a future flood.',
+                        'Official active alerts must come from the /api/flood-alerts endpoint and INAMHI; never invent an active warning.',
+                        'Do not invent live river levels, rainfall, affected population, losses, or exact forecast times.',
+                        'Lower Guayas is cumulative/downstream and overlaps upstream drainage.'
+                    ]
+                };
+
+                const model = String(process.env.GEMINI_MODEL || 'gemini-2.5-flash').trim();
+                const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' +
+                    encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(apiKey);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                try {
+                    const aiResponse = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            systemInstruction: {
+                                parts: [{
+                                    text: 'You are HydroVision’s multilingual river-basin and flood-intelligence assistant. Answer the user in the same language as their question (Arabic Egyptian dialect when Arabic, otherwise clear English or Spanish). Understand typos, colloquial phrasing, follow-up questions and questions that combine multiple topics. Use ONLY the supplied project context for project-specific measurements and claims. You may explain general concepts, but clearly distinguish general knowledge from measured project data. Never invent live conditions, forecasts, flood warnings, statistics, citations, or local observations. If the project lacks the requested data, say exactly what is missing and what source or dataset would be needed. Do not present classified area as confirmed flood damage or flood probability. Do not claim a future flood from one satellite scene. For immediate safety advice, prioritize official authority instructions, never crossing floodwater, moving away from riverbanks/low areas, and emergency services. Give a useful direct answer with short headings or bullets when appropriate. If the local answer is relevant, correct and expand it using context rather than contradicting data.'
+                                }]
+                            },
+                            contents: [{
+                                role: 'user',
+                                parts: [{ text: 'User question: ' + question + '\n\nGround-truth project context (JSON):\n' + JSON.stringify(projectContext) }]
+                            }],
+                            generationConfig: {
+                                temperature: 0.25,
+                                topP: 0.85,
+                                maxOutputTokens: 850
+                            }
+                        })
+                    });
+                    if (!aiResponse.ok) throw new Error('Gemini HTTP ' + aiResponse.status);
+                    const aiData = await aiResponse.json();
+                    const candidate = aiData.candidates && aiData.candidates[0];
+                    const generated = candidate && candidate.content && candidate.content.parts
+                        ? candidate.content.parts.map(part => part.text || '').join('').trim()
+                        : '';
+                    if (generated && candidate.finishReason !== 'SAFETY') {
+                        finalAnswer = generated;
+                        answerSource = 'gemini-grounded-with-local-fallback';
+                        generatedByAI = true;
+                    }
+                } finally {
+                    clearTimeout(timeout);
+                }
+            } catch (aiError) {
+                console.warn('Gemini assistant fallback:', aiError.name === 'AbortError' ? 'timeout' : aiError.message);
+            }
+        }
+
         res.json({
             ok: true,
-            answer: output.join('\n\n'),
+            answer: finalAnswer || text.general,
             language: lang,
             basinId,
             detectedIntents: Object.keys(intents).filter(key => intents[key]),
-            source: 'local-project-data-intent-engine',
-            generatedByAI: false
+            source: answerSource,
+            generatedByAI,
+            fallbackUsed: !generatedByAI,
+            responseMode: generatedByAI ? 'grounded-ai' : 'local-knowledge'
         });
     } catch (error) {
         console.error('Assistant error:', error);
