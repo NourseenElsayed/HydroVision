@@ -723,18 +723,18 @@ function hvParseCapFeed(xml, basinId) {
     const wantedAreas = areasByBasin[basinId] || areasByBasin.babahoyo;
     const normalizeText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const alerts = [];
-    const capBlocks = [...String(xml).matchAll(/<(?:[\w.-]+:)?alert\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?alert\\s*>/gi)].map(m => m[1]);
+    const capBlocks = [...String(xml).matchAll(/<(?:[\w.-]+:)?alert\b[^>]*>([\s\S]*?)<\/(?:[\w.-]+:)?alert\s*>/gi)].map(m => m[1]);
     for (const block of capBlocks) {
         const status = hvXmlTag(block, 'status') || 'Actual';
         const scope = hvXmlTag(block, 'scope') || 'Public';
         if (!/^actual$/i.test(status) || !/^public$/i.test(scope)) continue;
-        const infos = [...block.matchAll(/<(?:[\w.-]+:)?info\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?info\\s*>/gi)].map(m => m[1]);
+        const infos = [...block.matchAll(/<(?:[\w.-]+:)?info\b[^>]*>([\s\S]*?)<\/(?:[\w.-]+:)?info\s*>/gi)].map(m => m[1]);
         for (const info of (infos.length ? infos : [block])) {
             const headline = hvXmlTag(info, 'headline') || hvXmlTag(info, 'event') || 'Official weather or hydrological alert';
             const event = hvXmlTag(info, 'event');
             const description = hvXmlTag(info, 'description');
             const instruction = hvXmlTag(info, 'instruction');
-            const areas = [...info.matchAll(/<(?:[\w.-]+:)?areaDesc(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?areaDesc\\s*>/gi)]
+            const areas = [...info.matchAll(/<(?:[\w.-]+:)?areaDesc(?:\s[^>]*)?>([\s\S]*?)<\/(?:[\w.-]+:)?areaDesc\s*>/gi)]
                 .map(m => hvXmlDecode(m[1]).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
             const searchable = normalizeText([headline, event, description, instruction, areas.join(' ')].join(' '));
             const areaText = normalizeText(areas.join(' ') + ' ' + description);
@@ -760,7 +760,7 @@ function hvParseCapFeed(xml, basinId) {
         }
     }
     if (!capBlocks.length) {
-        const items = [...String(xml).matchAll(/<item\b[^>]*>([\\s\\S]*?)<\\/item\\s*>/gi)].map(m => m[1]);
+        const items = [...String(xml).matchAll(/<item\b[^>]*>([\s\S]*?)<\/item\s*>/gi)].map(m => m[1]);
         for (const item of items) {
             const headline = hvXmlTag(item, 'title') || 'Official weather or hydrological alert';
             const description = hvXmlTag(item, 'description');
