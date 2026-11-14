@@ -2027,9 +2027,13 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
 
     <script>
         let currentLang = (function(){ try { const saved=localStorage.getItem('hydrovision-language'); return ['ar','en','es'].includes(saved)?saved:'ar'; } catch(e){ return 'ar'; } })();
-        let currentRole = 'farmer';
-        let currentBasin = 'babahoyo';
+        let currentRole = (function(){ try { const saved=localStorage.getItem('hydrovision-role'); return ['farmer','tourist','resident'].includes(saved)?saved:'farmer'; } catch(e){ return 'farmer'; } })();
+        let currentBasin = (function(){ try { const saved=localStorage.getItem('hydrovision-basin'); return ['babahoyo','lower_guayas','daule','vinces'].includes(saved)?saved:'babahoyo'; } catch(e){ return 'babahoyo'; } })();
         let currentSeason = 'flood';
+
+        // Restore the selected basin and user profile across every page route.
+        document.querySelectorAll('.basin-btn').forEach(btn => btn.classList.toggle('active-btn', btn.id === 'basin-' + currentBasin));
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.toggle('active-btn', btn.id === 'role-' + currentRole));
 
         const i18n = {
             ar: {
@@ -2172,6 +2176,7 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
 
         function setRole(role) {
             currentRole = role;
+            try { localStorage.setItem('hydrovision-role', role); } catch (e) {}
             document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active-btn'));
             document.getElementById('role-' + role).classList.add('active-btn');
             fetchAnalysis();
@@ -2179,6 +2184,7 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
 
         function setBasin(basin) {
             currentBasin = basin;
+            try { localStorage.setItem('hydrovision-basin', basin); } catch (e) {}
             document.querySelectorAll('.basin-btn').forEach(btn => btn.classList.remove('active-btn'));
             document.getElementById('basin-' + basin).classList.add('active-btn');
             fetchAnalysis();
