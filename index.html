@@ -1579,6 +1579,151 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
 @media(max-width:520px){.hv-rs-head{padding:19px}.hv-rs-body{padding:12px}.hv-rs-screen{min-height:340px}.hv-rs-screen-copy{padding:22px 17px}.hv-rs-chapters{padding:12px}.hv-rs-chapter{font-size:11px;padding:8px 11px}}
 @media(prefers-reduced-motion:reduce){.hv-rs-river,.hv-rs-river-thin,.hv-rs-cloud{animation:none!important}}
 </style>
+
+<!-- HV_LIGHT_THEME_AND_ALIGNMENT_FIX_V1 -->
+<style id="hv-light-theme-alignment-fix">
+/* Consistent reading direction: Arabic RTL, English/Spanish LTR */
+html[dir="rtl"] main.hv-layout-main,
+html[dir="rtl"] main.hv-layout-main section,
+html[dir="rtl"] main.hv-layout-main article {
+  direction: rtl;
+}
+html[dir="ltr"] main.hv-layout-main,
+html[dir="ltr"] main.hv-layout-main section,
+html[dir="ltr"] main.hv-layout-main article {
+  direction: ltr;
+}
+main.hv-layout-main p,
+main.hv-layout-main h1,
+main.hv-layout-main h2,
+main.hv-layout-main h3,
+main.hv-layout-main h4,
+main.hv-layout-main li,
+main.hv-layout-main label,
+main.hv-layout-main .hv-evidence-muted,
+main.hv-layout-main .hv-evidence-row,
+main.hv-layout-main .hv-page-heading {
+  text-align: start !important;
+}
+html[dir="rtl"] main.hv-layout-main .hv-evidence-row strong { text-align: start !important; }
+html[dir="ltr"] main.hv-layout-main .hv-evidence-row strong { text-align: start !important; }
+
+/* Light mode: stronger contrast and solid readable information surfaces */
+html[data-hv-theme="light"] {
+  --hv-text: #20372e;
+  --hv-muted: #4c5e53;
+  --hv-border: rgba(74, 97, 76, .28);
+  --hv-card: #fffdf7;
+  --hv-card-soft: #f1f5eb;
+  --hv-sidebar-bg: #e5ecdf;
+  --hv-sidebar-text: #263f34;
+  --hv-sidebar-muted: #53685a;
+  --hv-sidebar-active: #cbdcc9;
+  --hv-sidebar-border: rgba(64, 95, 72, .25);
+  --hv-page-surface: #fffdf7;
+  --hv-input-bg: #fffdf7;
+  --hv-soft-surface: #edf3e9;
+  --hv-shadow: rgba(34, 54, 39, .13);
+}
+html[data-hv-theme="light"] body {
+  color: #263b31 !important;
+  background: linear-gradient(145deg,#f5f3e9 0%,#e8efe5 52%,#f5ecdf 100%) !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main .glass-card,
+html[data-hv-theme="light"] main.hv-layout-main .hv-evidence-card,
+html[data-hv-theme="light"] main.hv-layout-main [class*="bg-slate-900"],
+html[data-hv-theme="light"] main.hv-layout-main [class*="bg-slate-800"] {
+  background-color: #fffdf7 !important;
+  background-image: linear-gradient(145deg,#fffdf8,#edf3e9) !important;
+  color: #263b31 !important;
+  border-color: rgba(74,97,76,.25) !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main .glass-card p,
+html[data-hv-theme="light"] main.hv-layout-main .glass-card li,
+html[data-hv-theme="light"] main.hv-layout-main .glass-card label,
+html[data-hv-theme="light"] main.hv-layout-main .glass-card span,
+html[data-hv-theme="light"] main.hv-layout-main .glass-card strong,
+html[data-hv-theme="light"] main.hv-layout-main .glass-card div,
+html[data-hv-theme="light"] main.hv-layout-main .hv-evidence-card,
+html[data-hv-theme="light"] main.hv-layout-main .hv-evidence-card p,
+html[data-hv-theme="light"] main.hv-layout-main .hv-evidence-card span,
+html[data-hv-theme="light"] main.hv-layout-main .hv-evidence-card strong {
+  color: #293f34 !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main .text-white,
+html[data-hv-theme="light"] main.hv-layout-main .text-slate-100,
+html[data-hv-theme="light"] main.hv-layout-main .text-slate-200,
+html[data-hv-theme="light"] main.hv-layout-main .text-slate-300,
+html[data-hv-theme="light"] main.hv-layout-main .text-slate-400,
+html[data-hv-theme="light"] main.hv-layout-main .text-slate-500 {
+  color: #526257 !important;
+}
+/* Preserve white lettering on intentionally dark/colored controls and the photo hero */
+html[data-hv-theme="light"] main.hv-layout-main button,
+html[data-hv-theme="light"] #hv-theme-toggle,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child,
+html[data-hv-theme="light"] #view-public > .glass-card:first-child * ,
+html[data-hv-theme="light"] .hv-rs-screen,
+html[data-hv-theme="light"] .hv-rs-screen * {
+  color: inherit;
+}
+html[data-hv-theme="light"] main.hv-layout-main .active-btn,
+html[data-hv-theme="light"] main.hv-layout-main .hv-rs-btn,
+html[data-hv-theme="light"] main.hv-layout-main .hv-rs-chapter[aria-pressed="true"] {
+  color: #fff !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main input,
+html[data-hv-theme="light"] main.hv-layout-main select,
+html[data-hv-theme="light"] main.hv-layout-main textarea {
+  background: #fff !important;
+  color: #20372e !important;
+  border: 1px solid #9aab98 !important;
+}
+html[data-hv-theme="light"] main.hv-layout-main input::placeholder,
+html[data-hv-theme="light"] main.hv-layout-main textarea::placeholder {
+  color: #68776b !important;
+  opacity: 1;
+}
+html[data-hv-theme="light"] #hv-sidebar {
+  background: linear-gradient(180deg,#edf2e8,#dfe9dc) !important;
+  color: #263f34 !important;
+  border-color: rgba(64,95,72,.25) !important;
+}
+html[data-hv-theme="light"] #hv-sidebar .hv-side-link {
+  color: #294437 !important;
+}
+html[data-hv-theme="light"] #hv-sidebar .hv-side-link.active {
+  background: #cbdcc9 !important;
+  color: #20372e !important;
+}
+html[data-hv-theme="light"] .hv-page-heading {
+  background: #fffdf7 !important;
+  color: #263b31 !important;
+  border-color: rgba(74,97,76,.25) !important;
+}
+html[data-hv-theme="light"] .hv-page-heading h1 { color: #244638 !important; }
+html[data-hv-theme="light"] .hv-page-heading p { color: #526257 !important; }
+html[data-hv-theme="light"] .hv-evidence-warning {
+  color: #694719 !important;
+  background: #fff1d6 !important;
+  border-color: #d49b42 !important;
+}
+html[data-hv-theme="light"] .hv-evidence-kpi,
+html[data-hv-theme="light"] #hv-earth-answer {
+  background: #edf3e9 !important;
+  color: #293f34 !important;
+}
+html[data-hv-theme="light"] .hv-rs-side,
+html[data-hv-theme="light"] .hv-rs-step {
+  color: #293f34 !important;
+}
+@media (max-width:680px) {
+  html[dir="rtl"] main.hv-layout-main,
+  html[dir="ltr"] main.hv-layout-main { text-align: start; }
+}
+</style>
+<!-- /HV_LIGHT_THEME_AND_ALIGNMENT_FIX_V1 -->
+
 </head>
 <body class="min-h-screen flex flex-col">
 <div id="nasa-top-logo">
