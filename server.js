@@ -604,7 +604,15 @@ app.post('/api/assistant', async (req, res) => {
             sectors: has('agriculture', 'agricultural', 'farm', 'farms', 'farming', 'crop', 'fishing', 'fishery', 'trade', 'commercial', 'transport', 'road', 'livestock', 'زراعه', 'الزراعة', 'مزارع', 'محاصيل', 'صيد', 'سمك', 'تجاره', 'نقل', 'طرق', 'ماشية', 'ثروة حيوانية', 'agricultura', 'pesca', 'comercio', 'transporte', 'carreteras', 'ganaderia'),
             rivers: has('river', 'rivers', 'stream', 'hydrorivers', 'river network', 'نهر', 'انهار', 'الانهار', 'مجرى', 'شبكة الانهار', 'مقاطع', 'rio', 'rios', 'red fluvial'),
             comparison: has('compare', 'comparison', 'compare all', 'all basins', 'which basin', 'largest basin', 'highest basin', 'versus', ' vs ', 'مقارن', 'قارن', 'مقارنة', 'كل الاحواض', 'الاحواض كلها', 'اي حوض', 'اكبر حوض', 'اعلى حوض', 'comparar', 'comparacion', 'todas las cuencas', 'que cuenca', 'mayor cuenca'),
-            why: has('why', 'reason', 'cause', 'explain why', 'ليه', 'لماذا', 'السبب', 'اسباب', 'عشان ايه', 'por que', 'causa', 'razon')
+            why: has('why', 'reason', 'cause', 'explain why', 'ليه', 'لماذا', 'السبب', 'اسباب', 'عشان ايه', 'por que', 'causa', 'razon'),
+            overview: has('what is hydrovision', 'about hydrovision', 'project overview', 'what does this project do', 'عرفني بالمشروع', 'ايه هو المشروع', 'المشروع ده', 'فكرة المشروع', 'هدف المشروع', 'عن المشروع', 'que es hydrovision', 'objetivo del proyecto'),
+            seasonal: has('season', 'rainy season', 'dry season', 'wet season', 'monsoon', 'موسم الامطار', 'موسم المطر', 'موسم الجفاف', 'الشتاء', 'الصيف', 'el nino', 'temporada lluviosa', 'temporada seca'),
+            history: has('river history', 'history of the river', 'how was the river formed', 'تاريخ النهر', 'نشأة النهر', 'اتكون ازاي', 'تكون النهر', 'قصة النهر', 'historia del rio', 'origen del rio'),
+            alerts: has('alert', 'warning', 'early warning', 'notification', 'flood warning', 'انذار', 'تنبيه', 'اشعار', 'تحذير', 'فيضان جاي', 'هل في فيضان', 'alerta', 'aviso'),
+            sources: has('references', 'reference', 'citation', 'where did data come from', 'data sources', 'مصادر', 'المراجع', 'المصدر', 'جبتوا البيانات منين', 'من اين البيانات', 'fuentes', 'referencias'),
+            features: has('features', 'what can i do', 'how to use', 'website sections', 'pages', 'خصائص', 'مميزات', 'استخدم الموقع ازاي', 'الموقع بيعمل ايه', 'اقسام الموقع', 'ازاي استخدم', 'funciones', 'como usar', 'secciones'),
+            emergency: has('what should i do', 'what to do now', 'evacuate', 'safety steps', 'اعمل ايه', 'اعمل ايه دلوقتي', 'اتصرف ازاي', 'لو حصل فيضان', 'احمي نفسي', 'اجراءات السلامة', 'evacuacion', 'que debo hacer'),
+            livestock: has('livestock', 'cattle', 'animals', 'ماشية', 'مواشي', 'حيوانات', 'ganado')
         };
 
         const row = getRow(basinId);
@@ -665,6 +673,48 @@ app.post('/api/assistant', async (req, res) => {
         if (intents.limits) add(text.limits);
         if (intents.sectors) add(text.sectors);
         if (intents.why) add(text.why);
+
+        const knowledge = {
+            ar: {
+                overview: 'HydroVision منصة تفاعلية لدعم فهم ومراقبة مخاطر الفيضانات في حوض نهر Guayas بالإكوادور. تجمع بيانات الاستشعار عن بعد والخرائط وشبكة الأنهار والمعلومات الموسمية في واجهة واحدة، وتعرض مؤشرات مكانية تساعد على فهم المناطق التي قد تكون أكثر تعرضًا للغمر. الأحواض التي يغطيها المشروع: Babahoyo وLower Guayas وDaule وVinces. المنصة أداة معلوماتية مساعدة وليست جهة إنذار أو تنبؤ رسمية.',
+                seasonal: 'على ساحل الإكوادور، يمتد موسم الأمطار تقريبًا من ديسمبر إلى مايو، وموسم الجفاف من يونيو إلى نوفمبر، مع اختلاف التوقيت والشدة من سنة لأخرى. قد تزيد ظاهرة El Niño من الأمطار ومخاطر الفيضانات. هذه أنماط موسمية عامة وليست توقعًا لحالة الطقس الحالية؛ يجب مراجعة INAMHI للتحديثات.',
+                history: 'تتصل أنهار Babahoyo وDaule بروافد وشبكات تصريف تصب باتجاه مجرى Guayas السفلي ومصبّه قرب Guayaquil. تتأثر ديناميكية النهر بالأمطار القادمة من المرتفعات، والتضاريس، والرواسب، وفي الجزء السفلي قد يتداخل تأثير المد مع تصريف النهر. لا يحدد المشروع تاريخًا جيولوجيًا دقيقًا لتكوّن النهر.',
+                alerts: 'يعرض HydroVision التنبيهات الرسمية المتاحة من INAMHI عند نجاح الاتصال بالمصدر ومطابقة التنبيه للمنطقة. عدم ظهور تنبيه لا يعني عدم وجود خطر. راجع دائمًا INAMHI والسلطات المحلية، ولا تعتمد على بيانات الأقمار الصناعية وحدها للتنبؤ بفيضان قادم.',
+                sources: 'تشمل المصادر NASA-ISRO NISAR Level-2 GCOV لرصد الاستجابة الرادارية، وCopernicus DEM GLO-30 للتضاريس، وHydroRIVERS وHydroBASINS لشبكة الأنهار والأحواض، إضافة إلى INAMHI للتنبيهات والمعلومات الجوية والهيدرولوجية الرسمية.',
+                features: 'يمكنك استكشاف الخريطة التفاعلية، اختيار أحد الأحواض الأربعة، مراجعة مؤشرات التحليل والمقارنة بينها، قراءة قصة النهر، الاطلاع على الأدلة والمصادر، واستخدام Ask Earth لطرح الأسئلة. كما تعرض المنصة تنبيهات INAMHI عند توفرها.',
+                emergency: 'إذا صدر تحذير رسمي: اتبع تعليمات السلطات المحلية، ابتعد عن ضفاف الأنهار والمناطق المنخفضة، لا تمشِ أو تقُد عبر مياه الفيضان، وانتقل إلى مكان مرتفع إذا طُلب منك ذلك. احتفظ بالهاتف والوثائق والأدوية الأساسية جاهزة، ولا تلمس الأسلاك أو الأجهزة الكهربائية التي وصلتها المياه. في الإكوادور اتصل بـ ECU 911 عند الطوارئ.',
+                livestock: 'بالنسبة للثروة الحيوانية، تساعد خرائط المناطق المنخفضة ومؤشرات الغمر على تحديد المواقع التي تستحق المتابعة، لكنها لا تحدد أعداد الحيوانات المتضررة. عند صدور تحذير رسمي، انقل الحيوانات فقط إذا كان الطريق آمنًا واتبع تعليمات السلطات والجهات الزراعية المحلية.'
+            },
+            en: {
+                overview: 'HydroVision is an interactive platform supporting flood-risk understanding and monitoring across Ecuador’s Guayas River Basin. It brings together remote-sensing observations, maps, river networks and seasonal information to help users understand areas that may be exposed to inundation. It covers Babahoyo, Lower Guayas, Daule and Vinces. It is an information-support tool, not an official forecasting or emergency authority.',
+                seasonal: 'On Ecuador’s coast, the rainy season generally runs from December to May and the drier season from June to November, although timing and intensity vary year to year. El Niño can increase rainfall and flood concerns. These are broad seasonal patterns, not a current weather forecast; check INAMHI for live updates.',
+                history: 'The Babahoyo and Daule rivers connect with tributaries and drainage networks flowing toward the lower Guayas channel and its estuary near Guayaquil. River dynamics are influenced by rainfall from the highlands, terrain, sediment, and, downstream, tidal effects interacting with river discharge. The project does not establish a precise geological formation date for the river.',
+                alerts: 'HydroVision displays available official INAMHI alerts when the source can be reached and an alert matches the selected area. No displayed alert does not mean there is no danger. Always check INAMHI and local authorities; satellite observations alone cannot predict an upcoming flood.',
+                sources: 'Sources include NASA-ISRO NISAR Level-2 GCOV for radar observations, Copernicus DEM GLO-30 for terrain, HydroRIVERS and HydroBASINS for river networks and catchments, and INAMHI for official weather and hydrological alerts.',
+                features: 'Explore the interactive map, select one of the four basins, review and compare analysis indicators, read the river story, inspect scientific evidence and sources, and ask questions through Ask Earth. The platform also displays INAMHI alerts when available.',
+                emergency: 'If an official warning is issued: follow local authorities, move away from riverbanks and low-lying areas, never walk or drive through floodwater, and move to higher ground if instructed. Keep your phone, documents and essential medicines ready. Do not touch electrical wires or equipment reached by water. In Ecuador, call ECU 911 for emergencies.',
+                livestock: 'For livestock, low-lying-area maps and inundation indicators can help identify locations that need attention, but they do not estimate affected animal counts. If an official warning is issued, move animals only when the route is safe and follow local authorities and agricultural services.'
+            },
+            es: {
+                overview: 'HydroVision es una plataforma interactiva para comprender y monitorear el riesgo de inundaciones en la cuenca del río Guayas, Ecuador. Integra observaciones satelitales, mapas, redes fluviales e información estacional. Cubre Babahoyo, Guayas inferior, Daule y Vinces. Es una herramienta informativa, no una autoridad oficial de pronóstico o emergencia.',
+                seasonal: 'En la costa ecuatoriana, la temporada lluviosa suele extenderse de diciembre a mayo y la temporada seca de junio a noviembre, con variaciones anuales. El Niño puede aumentar las lluvias y el riesgo de inundaciones. Son patrones generales, no un pronóstico actual; consulta al INAMHI.',
+                history: 'Los ríos Babahoyo y Daule se conectan con afluentes y redes de drenaje que fluyen hacia el cauce inferior del Guayas y su estuario cerca de Guayaquil. Influyen las lluvias de las tierras altas, el relieve, los sedimentos y, aguas abajo, las mareas. El proyecto no establece una fecha geológica exacta de formación del río.',
+                alerts: 'HydroVision muestra alertas oficiales disponibles del INAMHI cuando la fuente responde y la alerta coincide con la zona seleccionada. La ausencia de una alerta mostrada no significa que no exista peligro. Consulta siempre al INAMHI y a las autoridades locales.',
+                sources: 'Las fuentes incluyen NASA-ISRO NISAR Level-2 GCOV para observaciones de radar, Copernicus DEM GLO-30 para el terreno, HydroRIVERS y HydroBASINS para redes fluviales y cuencas, e INAMHI para alertas oficiales.',
+                features: 'Explora el mapa interactivo, selecciona una de las cuatro cuencas, revisa y compara indicadores, consulta la historia del río, las evidencias científicas y las fuentes, y pregunta a Ask Earth. También se muestran alertas del INAMHI cuando están disponibles.',
+                emergency: 'Si se emite una alerta oficial: sigue las instrucciones de las autoridades, aléjate de las orillas y zonas bajas, nunca cruces agua de inundación a pie o en vehículo y desplázate a zonas altas si se indica. Prepara teléfono, documentos y medicamentos. En Ecuador llama al ECU 911 ante emergencias.',
+                livestock: 'Para el ganado, los mapas de zonas bajas y los indicadores de inundación ayudan a identificar lugares que requieren atención, pero no estiman el número de animales afectados. Mueve animales solo si la ruta es segura y sigue las indicaciones oficiales.'
+            }
+        }[lang];
+
+        if (intents.overview) add(knowledge.overview);
+        if (intents.seasonal) add(knowledge.seasonal);
+        if (intents.history) add(knowledge.history);
+        if (intents.alerts) add(knowledge.alerts);
+        if (intents.sources) add(knowledge.sources);
+        if (intents.features) add(knowledge.features);
+        if (intents.emergency) add(knowledge.emergency);
+        if (intents.livestock && !intents.sectors) add(knowledge.livestock);
 
         if (intents.rivers) {
             const r = riverData && riverData.basins && riverData.basins[basinId];
