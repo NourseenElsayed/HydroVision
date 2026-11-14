@@ -43,6 +43,21 @@
     height: 38px;
     object-fit: contain;
 }
+
+/* HV_RIVER_PHOTO_GALLERY_V1 */
+.hv-rs-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.72;filter:saturate(.9) contrast(1.04);transition:opacity .35s ease,transform 1.2s ease;transform:scale(1.025)}
+.hv-rs-screen.photo-loaded:before{opacity:.2}
+.hv-rs-screen.photo-loaded .hv-rs-art{opacity:.2}
+.hv-rs-photo-credit{position:absolute;z-index:3;top:12px;right:12px;max-width:70%;padding:6px 9px;border-radius:8px;background:rgba(3,18,20,.72);color:#fff;font:600 10px/1.5 Cairo,sans-serif;text-decoration:none;backdrop-filter:blur(6px)}
+.hv-rs-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}
+.hv-rs-thumb{position:relative;min-width:0;height:82px;border:2px solid transparent;border-radius:11px;overflow:hidden;padding:0;background:#183c3b;cursor:pointer}
+.hv-rs-thumb[aria-pressed="true"]{border-color:#e7bb6c;box-shadow:0 0 0 2px rgba(231,187,108,.18)}
+.hv-rs-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.hv-rs-thumb:hover img{transform:scale(1.07)}
+.hv-rs-thumb span{position:absolute;inset:auto 0 0;padding:4px 5px;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;text-align:left;font:600 9px Cairo,sans-serif}
+.hv-rs-gallery-label{font-size:11px;font-weight:800;color:#f2d49a;margin:14px 0 7px}
+@media(max-width:520px){.hv-rs-thumb{height:68px}.hv-rs-photo-credit{font-size:9px}}
+
 </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1777,7 +1792,7 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
   </nav>
   <div class="hv-rs-body">
    <div>
-    <div class="hv-rs-screen" id="hv-rs-screen" data-scene="0">
+    <div class="hv-rs-screen" id="hv-rs-screen" data-scene="0"><img class="hv-rs-photo" id="hv-rs-photo" alt="Guayas river landscape" loading="eager" src="https://commons.wikimedia.org/wiki/Special:FilePath/R%C3%ADo%20Guayas.jpg"><a class="hv-rs-photo-credit" id="hv-rs-photo-credit" href="https://commons.wikimedia.org/wiki/File:R%C3%ADo_Guayas.jpg" target="_blank" rel="noopener noreferrer">Photo: Wikimedia Commons</a>
      <svg class="hv-rs-art" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Animated illustration of mountains, river tributaries and a coastal plain">
       <circle cx="730" cy="75" r="43" fill="#f2ca7d" opacity=".85"/>
       <path class="hv-rs-cloud" d="M80 95c8-24 38-28 55-9 17-23 55-13 58 13 24 2 29 34 5 41H91c-28-3-31-34-11-45z"/>
@@ -1799,6 +1814,7 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
       <p id="hv-rs-scene-text">The Guayas basin is a landscape built by uplift, flowing water and layers of river sediment.</p>
      </div>
     </div>
+    <div class="hv-rs-gallery-label" id="hv-rs-gallery-label">Explore this river in photographs</div><div class="hv-rs-gallery" id="hv-rs-gallery" aria-label="River photo gallery"></div>
     <div class="hv-rs-progress" aria-label="Story progress"><span id="hv-rs-progress-fill"></span></div>
     <div class="hv-rs-controls">
      <div class="hv-rs-control-group">
@@ -3471,6 +3487,35 @@ recommendationsToShow.forEach(item => {
    {ar:["جزء من قصة أكبر","تواصل مياه Vinces رحلتها ضمن شبكة Babahoyo ثم نظام Guayas الأوسع؛ فكل حوض فرعي جزء من منظومة مترابطة."],en:["Part of a larger story","Vinces waters continue through the Babahoyo network and the wider Guayas system. Each sub-basin is one part of a connected whole."],es:["Parte de una historia mayor","Las aguas del Vinces continúan por la red Babahoyo y el sistema Guayas. Cada subcuenca forma parte de un conjunto conectado."]}
   ]
  };
+
+ var photoSets={
+  guayas:[
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/R%C3%ADo%20Guayas.jpg",title:"Guayas River",credit:"Montielec98 · CC BY-SA 4.0",page:"https://commons.wikimedia.org/wiki/File:R%C3%ADo_Guayas.jpg"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Guayas%20from%20Santa%20Ana.JPG",title:"River from Santa Ana Hill",credit:"Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:Guayas_River"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Mangroves%20of%20the%20Guayas%20Estuary%2C%20Ecuador%20%28Copernicus%202026-07-04%29.webp",title:"Guayas Estuary mangroves",credit:"Copernicus · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:Guayas_River"}
+  ],
+  babahoyo:[
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/R%C3%ADo%20Babahoyo.jpg",title:"Babahoyo River",credit:"Montielec98 · CC BY-SA 4.0",page:"https://commons.wikimedia.org/wiki/File:R%C3%ADo_Babahoyo.jpg"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Flooding%20in%20the%20Guayas%20and%20Los%20R%C3%ADos%20Provinces%2C%20Ecuador%20%28Copernicus%202026-03-09%29.png",title:"Satellite view of flooding",credit:"Copernicus Sentinel-1 · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/File:Flooding_in_the_Guayas_and_Los_R%C3%ADos_Provinces,_Ecuador_(Copernicus_2026-03-09).png"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/6%20phot.%20de%20Guayaquil%20en%201857%2C%20don%20A.%20Grandidier%20en%201889%20-%20btv1b53251095m%20%2801%20of%2012%29.jpg",title:"Historical Guayaquil archive",credit:"Bibliothèque nationale de France · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:Guayas_River"}
+  ],
+  lower_guayas:[
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Flooding%20in%20the%20Guayas%20and%20Los%20R%C3%ADos%20Provinces%2C%20Ecuador%20%28Copernicus%202026-03-09%29.png",title:"Floodplain satellite observation",credit:"Copernicus Sentinel-1 · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/File:Flooding_in_the_Guayas_and_Los_R%C3%ADos_Provinces,_Ecuador_(Copernicus_2026-03-09).png"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Mangroves%20of%20the%20Guayas%20Estuary%2C%20Ecuador%20%28Copernicus%202026-07-04%29.webp",title:"Estuary mangroves",credit:"Copernicus · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:Guayas_River"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Shrimp%20Farms%20of%20the%20Guayas%20Estuary%20%28153329%20-%20oli%2020240829%20lrg%29.jpg",title:"Aquaculture in the estuary",credit:"Copernicus · Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:Guayas_River"}
+  ],
+  daule:[
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/R%C3%ADo%20Daule.jpg",title:"Daule River",credit:"WMrapids · CC0",page:"https://commons.wikimedia.org/wiki/File:R%C3%ADo_Daule.jpg"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Daule%20River.jpg",title:"Daule River at Nobol",credit:"TriiipleThreat · CC BY-SA 3.0",page:"https://commons.wikimedia.org/wiki/File:Daule_River.jpg"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Daule%20River%202013.jpg",title:"Daule River, 2013",credit:"TriiipleThreat · CC BY 3.0",page:"https://commons.wikimedia.org/wiki/File:Daule_River_2013.jpg"}
+  ],
+  vinces:[
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Regatas%20vinces.jpg",title:"Boat regatta on the Vinces",credit:"JORGITO1983 · CC BY-SA 4.0",page:"https://commons.wikimedia.org/wiki/File:Regatas_vinces.jpg"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Paseo%20en%20lancha.png",title:"Boat journey near Vinces",credit:"Wikimedia Commons",page:"https://commons.wikimedia.org/wiki/Category:R%C3%ADo_Vinces"},
+   {url:"https://commons.wikimedia.org/wiki/Special:FilePath/Vinces%201910.jpg",title:"Vinces town, 1910",credit:"Xavier Yela Digital Collection · Public Domain",page:"https://commons.wikimedia.org/wiki/File:Vinces_1910.jpg"}
+  ]
+ };
+
  var labels={
   ar:{title:"من الأنديز إلى الخليج: حكاية نهر غواياس",intro:"رحلة وثائقية تفاعلية عبر التاريخ الجيولوجي، والروافد المتصلة، والسهول والمجتمعات النهرية.",chapters:["نهر غواياس","حوض باباهويو","غواياس السفلي","حوض داولي","حوض فينسيس"],timeline:"خط زمني للقصة",prev:"→ السابق",next:"الفصل التالي ←",voice:"🔊 استمع إلى السرد",stop:"■ إيقاف الصوت",chapter:"الفصل",scene:"المشهد",note:"المشاهد رسوم توضيحية وليست لقطات أقمار صناعية تاريخية. السرد الصوتي يستخدم ميزة تحويل النص إلى كلام المتاحة في المتصفح.",source:"الأساس العلمي: تقرير INAMHI الجيولوجي والهيدرولوجي · دراسة رواسب نهر Guayas."},
   en:{title:"From the Andes to the Gulf: The Guayas River Story",intro:"An interactive documentary journey through geological history, connected tributaries, floodplains and river communities.",chapters:["Guayas River","Babahoyo Basin","Lower Guayas","Daule Basin","Vinces Basin"],timeline:"Story timeline",prev:"← Previous",next:"Next chapter →",voice:"🔊 Narrate this scene",stop:"■ Stop voice",chapter:"CHAPTER",scene:"SCENE",note:"Scenes are explanatory illustrations, not historical satellite footage. Narration uses the browser's built-in text-to-speech voice.",source:"Scientific basis: INAMHI geological and hydrological overview · Guayas River sediment study."},
@@ -3495,6 +3540,21 @@ recommendationsToShow.forEach(item => {
   document.getElementById("hv-rs-scene-title").textContent=pair[0];
   document.getElementById("hv-rs-scene-text").textContent=pair[1];
   document.getElementById("hv-rs-screen").setAttribute("data-scene",String(step));
+
+  var photos=photoSets[current], activePhoto=photos[step%photos.length];
+  var photo=document.getElementById("hv-rs-photo"), credit=document.getElementById("hv-rs-photo-credit");
+  photo.src=activePhoto.url;photo.alt=activePhoto.title;photo.onerror=function(){this.style.display="none";document.getElementById("hv-rs-screen").classList.remove("photo-loaded");};
+  photo.onload=function(){this.style.display="block";document.getElementById("hv-rs-screen").classList.add("photo-loaded");};
+  credit.href=activePhoto.page;credit.textContent=activePhoto.credit;
+  var gallery=document.getElementById("hv-rs-gallery");gallery.innerHTML="";
+  photos.forEach(function(p,i){
+   var b=document.createElement("button");b.type="button";b.className="hv-rs-thumb";b.setAttribute("aria-pressed",String(i===step%photos.length));b.setAttribute("aria-label",p.title);
+   var im=document.createElement("img");im.src=p.url;im.alt=p.title;im.loading="lazy";
+   var cap=document.createElement("span");cap.textContent=p.title;
+   b.appendChild(im);b.appendChild(cap);b.addEventListener("click",function(){stopVoice();step=i;render();});gallery.appendChild(b);
+  });
+  document.getElementById("hv-rs-gallery-label").textContent=lang()==="ar"?"صور من الحوض":"Photographs from this river basin";
+
   document.getElementById("hv-rs-progress-fill").style.width=((step+1)/story.length*100)+"%";
   document.getElementById("hv-rs-prev").disabled=step===0;
   document.getElementById("hv-rs-next").disabled=step===story.length-1;
