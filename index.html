@@ -2162,6 +2162,7 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
             const root = document.getElementById('html-root');
             root.setAttribute('lang', currentLang);
             root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            if (window.hvRefreshThemeLabel) window.hvRefreshThemeLabel();
             document.getElementById('lang-label').textContent = currentLang === 'ar' ? 'English' : (currentLang === 'en' ? 'Español' : 'عربي')
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -2716,6 +2717,7 @@ recommendationsToShow.forEach(item => {
     }
 
     applyTheme(theme);
+    window.hvRefreshThemeLabel = function () { applyTheme(theme); };
 
     var button = document.createElement("button");
     button.id = "hv-theme-toggle";
