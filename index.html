@@ -3980,6 +3980,114 @@ html[data-hv-theme="light"] body footer * {
 </style>
 <!-- /HV_LIGHT_MODE_WHITE_TEXT_ROOT_CAUSE_FIX_V3 -->
 
+
+<!-- HV_FLOOD_ALERT_CENTER_CAP_V1 -->
+<style id="hv-flood-alert-style">
+#hv-flood-alert-root{position:fixed;right:18px;bottom:18px;z-index:99999;width:min(390px,calc(100vw - 24px));font-family:inherit;direction:inherit;color:#24382f}
+#hv-flood-alert-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #b8c9bb;border-radius:16px;background:#f8fbf6;color:#24382f;padding:12px 15px;box-shadow:0 12px 35px #10251d35;font-weight:800;cursor:pointer}
+#hv-flood-alert-toggle .hv-fa-status{font-size:11px;font-weight:700;color:#476c55}
+#hv-flood-alert-panel{display:none;margin-bottom:9px;max-height:min(68vh,570px);overflow:auto;background:#fbfdf9;border:1px solid #b8c9bb;border-radius:17px;box-shadow:0 16px 42px #10251d45;padding:15px;color:#263b30}
+#hv-flood-alert-root.hv-fa-open #hv-flood-alert-panel{display:block}
+#hv-flood-alert-panel *{color:inherit}
+.hv-fa-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.hv-fa-heading strong{font-size:15px;color:#1f4938}
+.hv-fa-pill{border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;background:#e6f0e7;color:#315b3d}
+.hv-fa-pill.severe{background:#ffe6d9;color:#9d341f}.hv-fa-pill.extreme{background:#fbd6d6;color:#8d1515}.hv-fa-pill.moderate{background:#fff0c9;color:#80540a}
+.hv-fa-alert{border:1px solid #e5c9a6;background:#fff8eb;border-radius:12px;padding:11px;margin:9px 0}
+.hv-fa-alert h4{font-size:13px;font-weight:900;color:#713b20;margin:0 0 5px}
+.hv-fa-alert p{font-size:12px;line-height:1.7;color:#4b4438;margin:5px 0}
+.hv-fa-alert ul{padding-inline-start:20px;margin:7px 0}.hv-fa-alert li{font-size:12px;line-height:1.75;color:#34483b;margin:3px 0}
+.hv-fa-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.hv-fa-actions button,.hv-fa-actions a{border:1px solid #b6c8b7;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:800;text-decoration:none;background:#edf4ed;color:#234535!important;cursor:pointer}
+.hv-fa-actions .primary{background:#245b48;color:#fff!important;border-color:#245b48}
+.hv-fa-meta{font-size:10px;color:#6b776d!important;line-height:1.6;margin-top:8px}
+#hv-flood-alert-toggle.hv-fa-active{border-color:#d77b51;background:#fff4e9}
+#hv-flood-alert-toggle.hv-fa-active .hv-fa-status{color:#a33b20}
+@media(max-width:600px){#hv-flood-alert-root{right:12px;bottom:12px;width:calc(100vw - 24px)}}
+</style>
+<div id="hv-flood-alert-root" aria-live="polite">
+ <div id="hv-flood-alert-panel"></div>
+ <button id="hv-flood-alert-toggle" type="button" aria-expanded="false">
+  <span id="hv-fa-toggle-title">🔔 مراقبة تنبيهات الفيضانات</span>
+  <span class="hv-fa-status" id="hv-fa-toggle-status">جاري الاتصال بالمصدر الرسمي…</span>
+ </button>
+</div>
+<script id="hv-flood-alert-engine">
+(function(){
+"use strict";
+const root=document.getElementById("hv-flood-alert-root");
+const panel=document.getElementById("hv-flood-alert-panel");
+const toggle=document.getElementById("hv-flood-alert-toggle");
+const statusEl=document.getElementById("hv-fa-toggle-status");
+const titleEl=document.getElementById("hv-fa-toggle-title");
+if(!root||!panel||!toggle)return;
+let initialized=false,latestAlerts=[],lastBasin="";
+const sourceUrl="https://servicios.inamhi.gob.ec/alertas/";
+const copy={
+ar:{title:"🔔 مراقبة تنبيهات الفيضانات",checking:"جاري التحقق…",active:"يوجد تحذير رسمي",none:"لا يوجد تحذير مطابق",offline:"المصدر غير متاح مؤقتًا",panel:"مركز تنبيهات الفيضانات",enable:"تفعيل إشعارات المتصفح",enabled:"الإشعارات مفعّلة",denied:"اسمح بالإشعارات من إعدادات المتصفح",official:"فتح التنبيهات الرسمية",updated:"آخر تحقق",disclaimer:"تنبيهات رسمية مرتبطة بالمنطقة المختارة. اتبع تعليمات السلطات؛ هذه الخدمة لا تضمن وصول كل التحذيرات ولا تستبدل نظام الطوارئ الرسمي.",noData:"لم يتم العثور على تحذير نشط مطابق للحوض في آخر تحقق.",offlineText:"تعذر الاتصال بمصدر التنبيهات الآن. افتح صفحة INAMHI الرسمية للتحقق مباشرة.",tipsTitle:"اعمل إيه دلوقتي؟",tips:{farmer:["ابتعد عن ضفاف الأنهار والأراضي المنخفضة المعرضة لتجمع المياه.","لا تحاول إنقاذ المعدات أو المحاصيل إذا كان ذلك يعرّضك للخطر؛ انقل الماشية فقط إذا كان الطريق آمنًا وباتباع توجيهات السلطات.","تابع حالة الطرق والتحذيرات المحلية وجهّز الهاتف والوثائق والأدوية الأساسية."],tourist:["أجّل زيارة ضفاف الأنهار والمناطق المنخفضة أثناء سريان التحذير.","لا تعبر الطرق أو الجسور المغمورة بالمياه، ولا تقترب من مجرى النهر لمشاهدة ارتفاعه.","اتبع تعليمات السلطات المحلية وتحقق من حالة الطريق قبل التحرك."],resident:["تابع تعليمات السلطات المحلية واستعد للانتقال إلى مكان آمن إذا صدر توجيه بالإخلاء.","لا تمشِ أو تقُد عبر مياه الفيضان، وابتعد عن مجرى النهر والمناطق المنخفضة.","جهّز الهاتف والوثائق والأدوية الضرورية، ولا تلمس أي أسلاك أو أجهزة كهربائية وصلت إليها المياه."]}},en:{title:"🔔 Flood alert monitoring",checking:"Checking official feed…",active:"Official warning found",none:"No matching active warning",offline:"Source temporarily unavailable",panel:"Flood Alert Center",enable:"Enable browser notifications",enabled:"Notifications enabled",denied:"Allow notifications in browser settings",official:"Open official alerts",updated:"Last checked",disclaimer:"Official alerts matched to the selected basin. Follow local authorities. This service cannot guarantee delivery and does not replace official emergency systems.",noData:"No active matching warning was found for this basin at the latest check.",offlineText:"The alert source could not be reached. Open the official INAMHI page to verify directly.",tipsTitle:"What should I do now?",tips:{farmer:["Stay away from riverbanks and low-lying fields that may collect water.","Do not risk your safety to rescue equipment or crops. Move livestock only if the route is safe and authorities advise it.","Check local road conditions and keep your phone, documents, and essential medicines ready."],tourist:["Postpone visits to riverbanks and low-lying areas while the warning is active.","Never walk or drive through floodwater, and do not approach the river to watch rising water.","Follow local authority instructions and check road conditions before travelling."],resident:["Follow local authority instructions and be ready to move to a safe place if evacuation is ordered.","Never walk or drive through floodwater; stay away from river channels and low-lying areas.","Keep your phone, documents, and essential medicines ready. Do not touch electrical equipment or wires reached by water."]}},es:{title:"🔔 Alertas de inundación",checking:"Consultando fuente oficial…",active:"Aviso oficial activo",none:"Sin avisos activos coincidentes",offline:"Fuente no disponible temporalmente",panel:"Centro de alertas",enable:"Activar notificaciones",enabled:"Notificaciones activadas",denied:"Permite notificaciones en el navegador",official:"Abrir alertas oficiales",updated:"Última consulta",disclaimer:"Avisos oficiales relacionados con la cuenca seleccionada. Sigue las indicaciones de las autoridades. Este servicio no garantiza la entrega y no sustituye los sistemas oficiales de emergencia.",noData:"No se encontró un aviso activo para esta cuenca en la última consulta.",offlineText:"No se pudo consultar la fuente. Abre la página oficial del INAMHI para verificar.",tipsTitle:"¿Qué debo hacer ahora?",tips:{farmer:["Aléjate de las orillas de los ríos y de los campos bajos que puedan inundarse.","No arriesgues tu seguridad para rescatar equipos o cultivos. Mueve el ganado solo si la ruta es segura y las autoridades lo indican.","Consulta el estado de las vías y prepara el teléfono, documentos y medicamentos esenciales."],tourist:["Pospón las visitas a las orillas de los ríos y zonas bajas mientras siga vigente el aviso.","Nunca cruces agua de inundación a pie o en vehículo ni te acerques al río para observar su nivel.","Sigue las indicaciones locales y comprueba el estado de las carreteras."],resident:["Sigue las instrucciones de las autoridades y prepárate para trasladarte a un lugar seguro si se ordena evacuar.","Nunca camines ni conduzcas por agua de inundación; aléjate de los cauces y zonas bajas.","Prepara el teléfono, documentos y medicamentos esenciales. No toques equipos ni cables eléctricos alcanzados por el agua."]}}};
+function lang(){let l="ar";try{l=(typeof currentLang!=="undefined"?currentLang:document.documentElement.lang)||"ar"}catch(e){}return copy[l]?l:"en"}
+function basin(){try{return typeof currentBasin!=="undefined"&&currentBasin?currentBasin:(localStorage.getItem("hydrovision-basin")||"babahoyo")}catch(e){return "babahoyo"}}
+function role(){try{return typeof currentRole!=="undefined"&&currentRole?currentRole:(localStorage.getItem("hydrovision-role")||"resident")}catch(e){return "resident"}}
+function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function time(v){if(!v)return "";const d=new Date(v);return Number.isNaN(d.getTime())?v:d.toLocaleString(lang()==="ar"?"ar-EG":lang()==="es"?"es-EC":"en-US",{dateStyle:"short",timeStyle:"short"})}
+function severityLabel(v){return ({extreme:{ar:"شديد جدًا",en:"Extreme",es:"Extremo"},severe:{ar:"شديد",en:"Severe",es:"Severo"},moderate:{ar:"متوسط",en:"Moderate",es:"Moderado"},minor:{ar:"منخفض",en:"Minor",es:"Menor"}}[v]||{ar:"تنبيه",en:"Alert",es:"Aviso"})[lang()]}
+function notifyNew(alerts){
+ let seen=[];try{seen=JSON.parse(localStorage.getItem("hv-inamhi-seen-alerts")||"[]")}catch(e){}
+ const ids=alerts.map(a=>a.id);
+ if(initialized&&"Notification" in window&&Notification.permission==="granted"){
+  const fresh=alerts.filter(a=>!seen.includes(a.id));
+  fresh.forEach(a=>{try{new Notification("HydroVision · "+severityLabel(a.severity),{body:(a.headline||a.event||"Official flood-related warning")+" — "+(a.areas||[]).join(", "),tag:"hv-"+a.id,renotify:false})}catch(e){}});
+ }
+ try{localStorage.setItem("hv-inamhi-seen-alerts",JSON.stringify(ids.slice(0,80)))}catch(e){}
+ initialized=true;
+}
+function render(data){
+ const t=copy[lang()],alerts=data.alerts||[];
+ titleEl.textContent=t.title;
+ toggle.classList.toggle("hv-fa-active",alerts.length>0);
+ statusEl.textContent=!data.available?t.offline:(alerts.length?t.active:t.none);
+ let html='<div class="hv-fa-heading"><strong>'+t.panel+'</strong><span class="hv-fa-pill '+(alerts[0]?esc(alerts[0].severity):"")+'">'+(alerts.length?severityLabel(alerts[0].severity):"HydroVision")+'</span></div>';
+ if(!data.available){html+='<div class="hv-fa-alert"><p>'+t.offlineText+'</p></div>'}
+ else if(!alerts.length){html+='<div class="hv-fa-alert"><p>'+t.noData+'</p></div>'}
+ alerts.forEach(a=>{
+  const desc=a.description||a.instruction||"";
+  const tips=t.tips[role()]||t.tips.resident;
+  html+='<article class="hv-fa-alert"><h4>'+esc(a.headline||a.event||"Official warning")+'</h4><div class="hv-fa-pill '+esc(a.severity)+'">'+severityLabel(a.severity)+'</div>';
+  if(desc)html+='<p>'+esc(desc.slice(0,1000))+'</p>';
+  if(a.areas&&a.areas.length)html+='<p><b>'+(lang()==="ar"?"المناطق:":lang()==="es"?"Zonas:":"Areas:")+'</b> '+esc(a.areas.join(" · "))+'</p>';
+  if(a.expires)html+='<p>'+(lang()==="ar"?"ساري حتى:":lang()==="es"?"Válido hasta:":"Valid until:")+' '+esc(time(a.expires))+'</p>';
+  html+='<b style="font-size:12px;color:#1f4938">'+t.tipsTitle+'</b><ul>'+tips.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></article>';
+ });
+ html+='<div class="hv-fa-actions"><button type="button" class="primary" id="hv-fa-enable">'+(("Notification" in window&&Notification.permission==="granted")?t.enabled:t.enable)+'</button><a href="'+sourceUrl+'" target="_blank" rel="noopener noreferrer">'+t.official+'</a></div>';
+ html+='<div class="hv-fa-meta">'+t.updated+': '+esc(time(data.checkedAt))+'<br>'+t.disclaimer+'</div>';
+ panel.innerHTML=html;
+ const enable=document.getElementById("hv-fa-enable");
+ if(enable)enable.addEventListener("click",async()=>{
+  if(!("Notification" in window)){enable.textContent="Browser notifications unavailable";return}
+  try{const p=await Notification.requestPermission();enable.textContent=p==="granted"?t.enabled:t.denied;if(p==="granted"&&latestAlerts.length){new Notification("HydroVision",{body:t.active+": "+(latestAlerts[0].headline||latestAlerts[0].event||"")})}}catch(e){enable.textContent=t.denied}
+ });
+}
+async function check(){
+ const b=basin();lastBasin=b;
+ statusEl.textContent=copy[lang()].checking;
+ try{
+  const res=await fetch("/api/flood-alerts?basinId="+encodeURIComponent(b),{cache:"no-store"});
+  const data=await res.json();
+  latestAlerts=data.alerts||[];
+  notifyNew(latestAlerts);
+  render(data);
+ }catch(e){render({available:false,alerts:[],checkedAt:new Date().toISOString()})}
+}
+toggle.addEventListener("click",()=>{const open=!root.classList.contains("hv-fa-open");root.classList.toggle("hv-fa-open",open);toggle.setAttribute("aria-expanded",String(open))});
+check();
+setInterval(()=>{if(document.visibilityState==="visible"&&basin()!==lastBasin)check();else if(document.visibilityState==="visible")check()},5*60*1000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check()});
+const oldToggleLanguage=window.toggleLanguage;
+if(typeof oldToggleLanguage==="function")window.toggleLanguage=function(){const v=oldToggleLanguage.apply(this,arguments);if(latestAlerts)render({available:true,alerts:latestAlerts,checkedAt:new Date().toISOString()});return v};
+})();
+</script>
+<!-- /HV_FLOOD_ALERT_CENTER_CAP_V1 -->
+
 </body>
 </html>
 
