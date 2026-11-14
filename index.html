@@ -42,6 +42,18 @@
 .hv-rs-gallery-label{font-size:11px;font-weight:800;color:#f2d49a;margin:14px 0 7px}
 @media(max-width:520px){.hv-rs-thumb{height:68px}.hv-rs-photo-credit{font-size:9px}}
 
+
+/* HV_DEVELOPMENT_TEAM */
+.hv-team-section{margin:34px auto 18px;padding:28px 24px;border:1px solid rgba(45,212,191,.2);border-radius:22px;background:linear-gradient(135deg,rgba(15,35,48,.96),rgba(10,28,39,.94));box-shadow:0 16px 42px rgba(0,0,0,.18)}
+.hv-team-kicker{color:#5eead4;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.hv-team-title{color:#f8fafc;font-size:clamp(22px,3vw,30px);font-weight:900;margin-top:7px}
+.hv-team-subtitle{color:#94a3b8;font-size:13px;margin-top:5px}
+.hv-team-name{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid rgba(148,163,184,.15);border-radius:14px;background:rgba(15,23,42,.58);min-width:0}
+.hv-team-avatar{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:rgba(20,184,166,.13);color:#5eead4;font-weight:900}
+.hv-team-ar{color:#f1f5f9;font-size:14px;font-weight:800}
+.hv-team-en{color:#94a3b8;font-size:11px;margin-top:3px;direction:ltr;text-align:start}
+@media(max-width:520px){.hv-team-section{padding:22px 15px}}
+
 </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1972,6 +1984,25 @@ html[data-hv-theme="light"] .hv-rs-source a{color:#16756b}
                 <div id="gov-cards" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>
         </div>
+
+
+        <!-- HV_DEVELOPMENT_TEAM -->
+        <section id="hv-development-team" class="hv-team-section" aria-labelledby="hv-team-heading" dir="auto">
+            <div class="text-center mb-6">
+                <div class="hv-team-kicker">THE PEOPLE BEHIND HYDROVISION</div>
+                <h2 id="hv-team-heading" class="hv-team-title">فريق تطوير الموقع</h2>
+                <p class="hv-team-subtitle">مجرة ضرب الدبانة · Magaret Darb El Debbanah</p>
+                <p class="hv-team-subtitle">Web Development Team</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="hv-team-name"><div class="hv-team-avatar">م</div><div><div class="hv-team-ar">ملك محمد علي</div><div class="hv-team-en">Malak Mohamed Ali</div></div></div>
+                <div class="hv-team-name"><div class="hv-team-avatar">م</div><div><div class="hv-team-ar">ملك نشأت</div><div class="hv-team-en">Malak Nashaat</div></div></div>
+                <div class="hv-team-name"><div class="hv-team-avatar">م</div><div><div class="hv-team-ar">ملك علاء</div><div class="hv-team-en">Malak Alaa</div></div></div>
+                <div class="hv-team-name"><div class="hv-team-avatar">ي</div><div><div class="hv-team-ar">يارا عبد العال</div><div class="hv-team-en">Yara Abdelaal</div></div></div>
+                <div class="hv-team-name"><div class="hv-team-avatar">ن</div><div><div class="hv-team-ar">نورسين السيد</div><div class="hv-team-en">Nourseen Elsayed</div></div></div>
+                <div class="hv-team-name"><div class="hv-team-avatar">إ</div><div><div class="hv-team-ar">إسراء مختار</div><div class="hv-team-en">Esraa Mokhtar</div></div></div>
+            </div>
+        </section>
 
     </main>
 
