@@ -3912,6 +3912,74 @@ html[data-hv-theme="light"] main.hv-layout-main textarea::placeholder {
 </style>
 <!-- /HV_LIGHT_MODE_FINAL_CONTRAST_SWEEP_V2 -->
 
+
+<!-- HV_LIGHT_MODE_WHITE_TEXT_ROOT_CAUSE_FIX_V3 -->
+<style id="hv-light-mode-white-text-root-fix">
+/* Override legacy rules that accidentally forced all light-mode card text to ivory */
+html[data-hv-theme="light"] body main.hv-layout-main,
+html[data-hv-theme="light"] body main.hv-layout-main :is(
+  .glass-card,.glass-card *,
+  #gov-cards,#gov-cards *,#rec-list,#rec-list *,
+  #story-text,#story-text *,
+  [data-hv-page-item],[data-hv-page-item] *,
+  .hv-evidence-card,.hv-evidence-card *,
+  .hv-team-section,.hv-team-section *,
+  .hv-page-heading,.hv-page-heading *
+) {
+  color: #263b30 !important;
+}
+/* Headings and secondary copy */
+html[data-hv-theme="light"] body main.hv-layout-main :is(h1,h2,h3,h4,h5,h6) {
+  color: #1e4939 !important;
+}
+html[data-hv-theme="light"] body main.hv-layout-main :is(p,li,label,small,em,strong,b,span,td,th,caption,dt,dd,figcaption) {
+  color: #344b3d !important;
+}
+/* Deliberately dark photographic/colored panels retain their light lettering */
+html[data-hv-theme="light"] body main.hv-layout-main #view-public > .glass-card:first-child,
+html[data-hv-theme="light"] body main.hv-layout-main #view-public > .glass-card:first-child *,
+html[data-hv-theme="light"] body main.hv-layout-main .hv-rs-screen-copy,
+html[data-hv-theme="light"] body main.hv-layout-main .hv-rs-screen-copy *,
+html[data-hv-theme="light"] body main.hv-layout-main .hv-rs-counter {
+  color: #fff4dc !important;
+}
+html[data-hv-theme="light"] body main.hv-layout-main .hv-rs-source a {
+  color: #126b60 !important;
+}
+/* Dark action buttons remain white-on-dark; ordinary buttons stay dark-on-light */
+html[data-hv-theme="light"] body main.hv-layout-main :is(
+  button.active-btn,button.hv-rs-btn,button.primary,
+  .hv-rs-chapter[aria-pressed="true"],a[role="button"].active-btn
+) {
+  color: #fff !important;
+}
+html[data-hv-theme="light"] body main.hv-layout-main button:not(.active-btn):not(.hv-rs-btn):not(.primary):not(.hv-rs-chapter[aria-pressed="true"]) {
+  color: #263b30 !important;
+}
+/* Inputs and dropdown options */
+html[data-hv-theme="light"] body main.hv-layout-main :is(input,textarea,select,option) {
+  color: #20372e !important;
+  background-color: #fff !important;
+}
+html[data-hv-theme="light"] body main.hv-layout-main :is(input,textarea)::placeholder {
+  color: #68776b !important;
+  opacity: 1 !important;
+}
+/* Team section and page heading */
+html[data-hv-theme="light"] body #hv-sidebar,
+html[data-hv-theme="light"] body #hv-sidebar * {
+  color: #263f34 !important;
+}
+html[data-hv-theme="light"] body #hv-sidebar .hv-side-link.active {
+  color: #20372e !important;
+}
+html[data-hv-theme="light"] body footer,
+html[data-hv-theme="light"] body footer * {
+  color: #f8f0df !important;
+}
+</style>
+<!-- /HV_LIGHT_MODE_WHITE_TEXT_ROOT_CAUSE_FIX_V3 -->
+
 </body>
 </html>
 
